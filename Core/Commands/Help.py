@@ -25,7 +25,7 @@ class Help:
         await self.__generate_paginator(ctx).send_paginator(ctx, ephemeral=False)
 
     def __get_commands(self, inte_ctx: Union[discord.Interaction, commands.Context]) \
-            -> Dict[str, List[Command | discord.app_commands.Command | discord.app_commands.ContextMenu]]:
+            -> Dict[str, List[Union[Command, discord.app_commands.Command, discord.app_commands.ContextMenu]]]:
 
         command_list = {}
 
