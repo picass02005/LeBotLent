@@ -1,0 +1,29 @@
+{
+    "token": "./TOKEN",
+    "data": {
+        "folder": "prod_data",
+        "database": "database.db"
+    },
+    "temp_dir": {
+        "path": "temp",
+        "default_max_time": 600,
+        "default_id_length": 32
+    },
+    "last_used_commands_timeout": 3600,
+    "last_used_commands_max": 50,
+    "max_used_commands_max_per_user": 5,
+    "base_embed_color": 6404891,
+    "paginator_view_base_id": "paginator",
+    "paginator_delete_after": 15800,
+    "bot_admin_prefix": "py.",
+    "update_config_prefix_delay": 600,
+    "error_report": {
+        "channel": 1252665610500964412,
+        "guild": 1226267872355942541,
+        "ping": [
+            360018891776327680
+        ],
+        "delete_after": 2592000
+    },
+    "disabled_cogs": []
+}

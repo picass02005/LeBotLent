@@ -1,0 +1,74 @@
+{
+    "cogs_list": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "cogs_reload": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "cogs_unload": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "sync": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "get_tb": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "stop": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "help_command": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "help_app_command": {
+        "roles": [],
+        "users": [],
+        "permission_code": [
+            0
+        ],
+        "guilds": [],
+        "group": []
+    }
+}
