@@ -18,8 +18,8 @@
     "bot_admin_prefix": ".",
     "update_config_prefix_delay": 30,
     "error_report": {
-        "channel": 1252665592272650402,
-        "guild": 1226267872355942541,
+        "channel": 1309591048653246575,
+        "guild": 1309590337832095805,
         "ping": [
             360018891776327680
         ],
