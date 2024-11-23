@@ -1,5 +1,6 @@
 import sqlite3
 
+import discord
 from discord import app_commands, Interaction, InteractionResponse, TextChannel, Embed
 from discord.ext import commands, tasks
 
@@ -12,7 +13,7 @@ class AutoThread(commands.GroupCog):
         self.bot: bot = bot
         self.database = database
 
-        self.__config = {}
+        self.__config = []
 
         database.execute(
             "CREATE TABLE IF NOT EXISTS AUTOTHREAD_CONFIG (GUILD_ID UNSIGNED INT, CHANNEL_ID UNSIGNED INT);"
@@ -22,14 +23,10 @@ class AutoThread(commands.GroupCog):
 
 
     def __update_config_from_db(self):
-        self.__config = {}
+        self.__config = []
 
-        for i in self.database.execute("SELECT GUILD_ID, CHANNEL_ID FROM AUTOTHREAD_CONFIG;").fetchall():
-            if not i[0] in self.__config.keys():
-                self.__config.update({i[0]: [i[1]]})
-
-            else:
-                self.__config[i[0]].append(i[1])
+        for i in self.database.execute("SELECT CHANNEL_ID FROM AUTOTHREAD_CONFIG;").fetchall():
+            self.__config.append(i[0])
 
     @tasks.loop(minutes=get_config("AutoThread.UpdateConfigFromSQL"))
     async def __update_config_task(self):
@@ -122,7 +119,16 @@ class AutoThread(commands.GroupCog):
 
         await resp.send_message(embed=e, ephemeral=True)
 
-    # TODO: Listener + keep config in RAM (self.config) updated with a task every few minutes + on admin commands
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        if message.channel.id in self.__config:
+            if message.content:
+                name = f"Reactions: {message.content}"
+
+            else:
+                name = "Reactions"
+
+            await message.create_thread(name=name, reason="Auto thread module")
 
 
 # === DO NOT REMOVE THE FOLLOWING OR CHANGE PARAMETERS === #
