@@ -1,7 +1,7 @@
 import sqlite3
 
 from discord import app_commands, Interaction, InteractionResponse, TextChannel, Embed
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 from GlobalModules.GetConfig import get_config
 from GlobalModules.HasPerm import has_perm
@@ -12,9 +12,28 @@ class AutoThread(commands.GroupCog):
         self.bot: bot = bot
         self.database = database
 
+        self.__config = {}
+
         database.execute(
             "CREATE TABLE IF NOT EXISTS AUTOTHREAD_CONFIG (GUILD_ID UNSIGNED INT, CHANNEL_ID UNSIGNED INT);"
         )
+
+        self.__update_config_from_db()
+
+
+    def __update_config_from_db(self):
+        self.__config = {}
+
+        for i in self.database.execute("SELECT GUILD_ID, CHANNEL_ID FROM AUTOTHREAD_CONFIG;").fetchall():
+            if not i[0] in self.__config.keys():
+                self.__config.update({i[0]: [i[1]]})
+
+            else:
+                self.__config[i[0]].append(i[1])
+
+    @tasks.loop(minutes=get_config("AutoThread.UpdateConfigFromSQL"))
+    async def __update_config_task(self):
+        self.__update_config_from_db()
 
     @app_commands.command(name="add_channel")
     @app_commands.default_permissions(administrator=True)
@@ -41,6 +60,8 @@ class AutoThread(commands.GroupCog):
             "INSERT INTO AUTOTHREAD_CONFIG (GUILD_ID, CHANNEL_ID) VALUES (?, ?);",
             (channel.guild.id, channel.id)
         )
+
+        self.__update_config_from_db()
 
         await resp.send_message(f"Channel <#{channel.id}> is now auto threaded.", ephemeral=True)
 
@@ -69,6 +90,8 @@ class AutoThread(commands.GroupCog):
             "DELETE FROM AUTOTHREAD_CONFIG WHERE GUILD_ID=? AND CHANNEL_ID=?;",
             (channel.guild.id, channel.id)
         )
+
+        self.__update_config_from_db()
 
         await resp.send_message(f"Channel <#{channel.id}> removed from auto threaded channels", ephemeral=True)
 
