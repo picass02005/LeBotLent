@@ -90,7 +90,7 @@ class CogManager:
                     # === Remove cog group === #
 
                     for i in self.bot.tree.get_commands(guild=guild):
-                        if i.name.lower() == cog_name.lower():
+                        if i.name.lower().replace("-", "") == cog_name.lower():
                             self.bot.tree.remove_command(i.name, guild=guild)
 
             await self.bot.remove_cog(cog_name)
