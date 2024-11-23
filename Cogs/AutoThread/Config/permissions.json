@@ -2,7 +2,9 @@
     "add_channel": {
         "roles": [],
         "users": [],
-        "permission_code": [],
+        "permission_code": [
+            8
+        ],
         "guilds": [],
         "group": [
             "bots_admin"
@@ -11,7 +13,9 @@
     "remove_channel": {
         "roles": [],
         "users": [],
-        "permission_code": [],
+        "permission_code": [
+            8
+        ],
         "guilds": [],
         "group": [
             "bots_admin"
@@ -20,7 +24,9 @@
     "list_channels": {
         "roles": [],
         "users": [],
-        "permission_code": [],
+        "permission_code": [
+            8
+        ],
         "guilds": [],
         "group": [
             "bots_admin"
