@@ -23,7 +23,7 @@ def is_test_version(print_message: bool = False) -> bool:
 
         print(
             f"################\n"
-            f"# CHUCK NOBOT  #\n"
+            f"#  LEBOTLENT   #\n"
             f"# ------------ #\n"
             f"# {tp} VERSION #\n"
             f"################"
