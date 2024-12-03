@@ -1,7 +1,7 @@
 {
     "token": "./TOKEN",
     "data": {
-        "folder": "prod_data",
+        "folder": "/LeBotLent_data",
         "database": "database.db"
     },
     "temp_dir": {

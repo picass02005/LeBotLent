@@ -39,6 +39,9 @@ errorHandler = ErrorHandler(database, bot)
 
 TEST_VERSION = is_test_version(print_message=True)
 
+if os.name == 'nt' and not TEST_VERSION:
+    print(f"\033[93mWARNING: Data folder can be found in C:{get_config('core.data.folder')}\033[0m")
+
 
 @bot.event
 async def on_ready():
