@@ -25,5 +25,32 @@
         "group": [
             "bots_admin"
         ]
+    },
+    "add_whitelist_thread": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "remove_whitelist_thread": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "list_whitelist_thread": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
     }
 }
