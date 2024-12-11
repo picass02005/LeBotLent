@@ -19,6 +19,10 @@ class AutoThread(commands.GroupCog):
             "CREATE TABLE IF NOT EXISTS AUTOTHREAD_CONFIG (GUILD_ID UNSIGNED INT, CHANNEL_ID UNSIGNED INT);"
         )
 
+        database.execute(
+            "CREATE TABLE IF NOT EXISTS AUTOTHREAD_REACT_WLIST (GUILD_ID UNSIGNED INT, USER_ID UNSIGNED INT);"
+        )
+
         self.__update_config_from_db()
 
 
@@ -119,16 +123,35 @@ class AutoThread(commands.GroupCog):
 
         await resp.send_message(embed=e, ephemeral=True)
 
+    @staticmethod
+    async def __make_thread(message: discord.Message):
+        if message.content:
+            name = f"Reactions: {message.content}"
+
+        else:
+            name = "Reactions"
+
+        await message.create_thread(name=name, reason="Auto thread module")
+
+    @staticmethod
+    async def thread_react(message: discord.Message):
+        for i in (127481, 127469, 127479, 127466, 127462, 127465):
+            await message.add_reaction(chr(i))
+
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.channel.id in self.__config:
-            if message.content:
-                name = f"Reactions: {message.content}"
+            if len(message.attachments):
+                await self.__make_thread(message)
 
-            else:
-                name = "Reactions"
+            elif len(
+                    self.database.execute(
+                        "SELECT 1 FROM AUTOTHREAD_REACT_WLIST WHERE GUILD_ID=? AND USER_ID=?",
+                        (message.guild.id, message.author.id)).fetchall()
+            ):
+                await self.thread_react(message)
 
-            await message.create_thread(name=name, reason="Auto thread module")
 
 
 # === DO NOT REMOVE THE FOLLOWING OR CHANGE PARAMETERS === #
