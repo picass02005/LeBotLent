@@ -142,7 +142,7 @@ class AutoThread(commands.GroupCog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.channel.id in self.__config:
-            if len(message.attachments):
+            if len(message.attachments) or "http" in message.content:
                 await self.__make_thread(message)
 
             elif len(
