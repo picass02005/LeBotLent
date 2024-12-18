@@ -1,8 +1,8 @@
 FROM python:3.12
-WORKDIR /usr/local/LeBotLent
+WORKDIR /root/lebotlent/git
 
 # Copy the source code (located in pwd)
-COPY * ./
+COPY * /root/lebotlent
 
 # Install the application dependencies
 RUN pip install --no-cache-dir -r requirements.txt
