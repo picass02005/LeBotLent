@@ -218,7 +218,7 @@ class AutoThread(commands.GroupCog):
             return
 
         if message.channel.id in self.__config:
-            if (len(message.attachments) or "http" in message.content) and not message.author.id == 312926990888075264:
+            if len(message.attachments) or "http" in message.content:
                 await self.__make_thread(message)
 
             elif len(
