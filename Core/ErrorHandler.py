@@ -192,7 +192,7 @@ class ErrorHandler:
                 'name': ctx.author.name,
                 'id': ctx.author.id
             },
-            'command': ctx.command.name,
+            'command': ctx.command.name if ctx.command is not None else "Undefined",
             'args_kwargs': {
                 'args': [self.__argument_to_string(i) for i in ctx.args[2:]],
                 'kwargs': [self.__argument_to_string(i) for i in ctx.kwargs]

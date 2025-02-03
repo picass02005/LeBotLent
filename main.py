@@ -91,7 +91,8 @@ bot.tree.on_error = errorHandler.app_command_error
 
 @bot.event
 async def on_command_error(ctx, exception):
-    await errorHandler.command_error(ctx, exception)
+    if not isinstance(exception, discord.ext.commands.errors.CommandNotFound):
+        await errorHandler.command_error(ctx, exception)
 
 
 @bot.event
