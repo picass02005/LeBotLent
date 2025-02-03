@@ -1,0 +1,7 @@
+{
+    "Leaderboard": {
+        "UpdateTimeMin": 120,
+        "DeleteAfter": 518400,
+        "_comment": "6 months"
+    }
+}

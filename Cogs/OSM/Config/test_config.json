@@ -1,0 +1,6 @@
+{
+    "Leaderboard": {
+        "UpdateTimeMin": 2,
+        "DeleteAfter": 86400
+    }
+}
