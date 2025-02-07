@@ -54,6 +54,9 @@ class OSM(commands.GroupCog):
     async def update_data(self):
         uids = [i[0] for i in self.database.execute("SELECT OSM_UID FROM OSM_LEADERBOARD_USERS;").fetchall()]
 
+        if not uids:
+            return
+
         users = await self.py_osm.fetch_users_info(uids)
 
         if users is None:
