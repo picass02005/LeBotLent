@@ -1,15 +1,19 @@
 # SPDX-License-Identifier: MIT
 # Copyright (C) 2025 picasso2005 <clementduran0@gmail.com> - All Rights Reserved
-
+import json
 import sqlite3
 import time
 from datetime import datetime
 
+import discord
+from discord import app_commands, Interaction
 from discord.ext import commands, tasks
 
 from Cogs.OSM.GetChangesNotesNb import get_notes_nb, get_changes_nb
 from Cogs.OSM.Py_OSM_API import PyOSM, py_osm_builder
+from Cogs.OSM.RegisterUserViews import RegisterSelectSelector
 from GlobalModules.GetConfig import get_config
+from GlobalModules.HasPerm import has_perm
 
 
 # === DO NOT CHANGE CLASS NAME OR __init__ PARAMETERS === #
@@ -49,6 +53,64 @@ class OSM(commands.GroupCog):
         )
 
         self.database.commit()
+
+    @app_commands.command(name="register_user")
+    @has_perm()
+    async def register_user(self, interaction: Interaction):
+        data = self.database.execute(
+            "SELECT DISC_GUILDS FROM OSM_LEADERBOARD_USERS WHERE DISC_UID=? LIMIT 1;",
+            (interaction.user.id,)
+        ).fetchone()
+
+        if data is None:
+            e = discord.Embed(
+                title="OpenStreetMap resgister account",
+                color=get_config("core.base_embed_color"),
+                description="Choose which method you want to use to connect your OSM account"
+            )
+
+            e.add_field(
+                name="By user name",
+                value="You will have to give your Open Street Map user name\n"
+                      "__This methos is case sensitibe__\n"
+                      "**This only works if you have made at least one changeset since your account creation**",
+                inline=True
+            )
+
+            e.add_field(
+                name="By User ID",
+                value="You will have to give your Open Street Map User ID (UID)\n"
+                      "To get your UID, please follow those steps:\n"
+                      "1. Log in your OSM account in any web browser\n"
+                      "2. Go on [this API url](https://api.openstreetmap.org/api/0.6/user/details.json)\n"
+                      "3. Search for a field named `id` located here: `{'user': {'id': YOUR_USER_ID, ...}, ...}`\n"
+                      "4. Copy and paste your UID",
+                inline=True
+            )
+
+            view = discord.ui.View()
+            view.add_item(RegisterSelectSelector(self.py_osm, interaction.user.id, self.database))
+
+            await interaction.response.send_message(embed=e, ephemeral=True, view=view)
+
+        else:
+            guilds = json.loads(data[0])
+
+            if interaction.guild_id in guilds:
+                await interaction.response.send_message("You are already registered on this guild", ephemeral=True)
+
+            else:
+                guilds.append(interaction.guild_id)
+
+                self.database.execute(
+                    "UPDATE OSM_LEADERBOARD_USERS SET DISC_GUILDS=? WHERE DISC_UID=?;",
+                    (json.dumps(guilds), interaction.user.id)
+                )
+                self.database.commit()
+
+                await interaction.response.send_message(
+                    "Your linked OSM account was syccessfully added to this guild", ephemeral=True
+                )
 
     @tasks.loop(minutes=get_config("OSM.Leaderboard.UpdateTimeMin"))
     async def update_data(self):
@@ -115,6 +177,9 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
 # TODO: Leaderboard
 # TODO: Search element
 # TODO: show map
+
+# TODO: admin manage users
+# TODO: unregister
 
 # TODO: When adding a user in DB, also fetch old changeset count + notes + nodes count
 # print(await get_notes_nb(py_osm, 14112053))
