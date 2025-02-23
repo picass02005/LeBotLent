@@ -9,5 +9,16 @@
         "group": [
             "bots_admin"
         ]
+    },
+    "unregister_user": {
+        "roles": [
+            0
+        ],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
     }
 }

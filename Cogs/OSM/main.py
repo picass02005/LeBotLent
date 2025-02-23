@@ -12,6 +12,7 @@ from discord.ext import commands, tasks
 from Cogs.OSM.GetChangesNotesNb import get_notes_nb, get_changes_nb
 from Cogs.OSM.Py_OSM_API import PyOSM, py_osm_builder
 from Cogs.OSM.RegisterUserViews import RegisterSelectSelector
+from Cogs.OSM.UnregisterUserViews import UnregisterView
 from GlobalModules.GetConfig import get_config
 from GlobalModules.HasPerm import has_perm
 
@@ -112,6 +113,53 @@ class OSM(commands.GroupCog):
                     "Your linked OSM account was syccessfully added to this guild", ephemeral=True
                 )
 
+    @app_commands.command(name="unregister_user")
+    @has_perm()
+    async def unregister_user(self, interaction: Interaction):
+        data = self.database.execute(
+            "SELECT DISC_GUILDS, OSM_UID FROM OSM_LEADERBOARD_USERS WHERE DISC_UID=? LIMIT 1;",
+            (interaction.user.id,)
+        ).fetchone()
+
+        if data is None:
+            await interaction.response.send_message("No OSM account are linked to you", ephemeral=True)
+
+        else:
+            guilds = json.loads(data[0])
+            osm_user = await self.py_osm.fetch_user_info(data[1])
+
+            e = discord.Embed(
+                title="OpenStreetMap unresgister account",
+                color=get_config("core.base_embed_color"),
+                description="What would you like to do with your linked OSM account?"
+
+            )
+
+            e.add_field(
+                name="Account details",
+                value=f"User name: `{osm_user.display_name}`\n"
+                      f"UID: `{osm_user.uid}`\n"
+                      f"Account created on: <t:{int(osm_user.account_created.timestamp())}:D>\n\n"
+                      f"Registered on following guilds:\n"
+                      f"{'\n'.join(
+                          [f'`{g.name}`' if (g := self.bot.get_guild(i)) is not None else f'`{i}`' for i in guilds]
+                      )}"
+            )
+
+            e.set_footer(text=osm_user.display_name, icon_url=osm_user.pfp_link if osm_user.pfp_link else None)
+
+            await interaction.response.send_message(
+                embed=e,
+                view=UnregisterView(
+                    self.database,
+                    osm_user,
+                    interaction.guild_id in guilds,
+                    len(guilds),
+                    interaction.user.id
+                ),
+                ephemeral=True
+            )
+
     @tasks.loop(minutes=get_config("OSM.Leaderboard.UpdateTimeMin"))
     async def update_data(self):
         uids = [i[0] for i in self.database.execute("SELECT OSM_UID FROM OSM_LEADERBOARD_USERS;").fetchall()]
@@ -179,7 +227,6 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
 # TODO: show map
 
 # TODO: admin manage users
-# TODO: unregister
 
 # TODO: When adding a user in DB, also fetch old changeset count + notes + nodes count
 # print(await get_notes_nb(py_osm, 14112053))

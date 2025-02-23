@@ -7,5 +7,14 @@
         "group": [
             "bots_admin"
         ]
+    },
+    "unregister_user": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
     }
 }
