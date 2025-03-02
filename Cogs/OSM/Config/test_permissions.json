@@ -16,5 +16,14 @@
         "group": [
             "bots_admin"
         ]
+    },
+    "add_leaderboard_msg": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
     }
 }

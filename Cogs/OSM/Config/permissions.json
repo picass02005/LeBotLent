@@ -1,21 +1,32 @@
 {
     "register_user": {
-        "roles": [
+        "roles": [],
+        "users": [],
+        "permission_code": [
             0
         ],
-        "users": [],
-        "permission_code": [],
         "guilds": [],
         "group": [
             "bots_admin"
         ]
     },
     "unregister_user": {
-        "roles": [
+        "roles": [],
+        "users": [],
+        "permission_code": [
             0
         ],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "add_leaderboard_msg": {
+        "roles": [],
         "users": [],
-        "permission_code": [],
+        "permission_code": [
+            8
+        ],
         "guilds": [],
         "group": [
             "bots_admin"

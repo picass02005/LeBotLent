@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: MIT
 # Copyright (C) 2025 picasso2005 <clementduran0@gmail.com> - All Rights Reserved
+
+import datetime
 import json
 import sqlite3
 import time
-from datetime import datetime
 
 import discord
 from discord import app_commands, Interaction
@@ -12,6 +13,7 @@ from discord.ext import commands, tasks
 from Cogs.OSM.GetChangesNotesNb import get_notes_nb, get_changes_nb
 from Cogs.OSM.Py_OSM_API import PyOSM, py_osm_builder
 from Cogs.OSM.RegisterUserViews import RegisterSelectSelector
+from Cogs.OSM.TimeUtils import transform_str_to_datetime_args, date_to_timestamp
 from Cogs.OSM.UnregisterUserViews import UnregisterView
 from GlobalModules.GetConfig import get_config
 from GlobalModules.HasPerm import has_perm
@@ -51,6 +53,14 @@ class OSM(commands.GroupCog):
             "TRACES_NB INTEGER,"
             "BLOCKS_NB INTEGER,"
             "BLOCKS_ACTIVE INTEGER);"
+        )
+
+        self.database.execute(
+            "CREATE TABLE IF NOT EXISTS OSM_LEADERBOARD_AUTO_MSG ("
+            "CHANNEL_ID INTEGER,"
+            "LAST_UPDATE INTEGER,"
+            "NEXT_UPDATE INTEGER,"
+            "UPDATE_EVERY TEXT);"
         )
 
         self.database.commit()
@@ -160,6 +170,56 @@ class OSM(commands.GroupCog):
                 ephemeral=True
             )
 
+    @app_commands.command(name="add_leaderboard_msg")
+    @app_commands.default_permissions(administrator=True)
+    @app_commands.choices(
+        duration=[
+            app_commands.Choice(name="Daily", value="1d"),
+            app_commands.Choice(name="Every 2 days", value="2d"),
+            app_commands.Choice(name="Every 3 days", value="3d"),
+            app_commands.Choice(name="Every 4 days", value="4d"),
+            app_commands.Choice(name="Every 5 days", value="5d"),
+            app_commands.Choice(name="Every 6 days", value="6d"),
+            app_commands.Choice(name="Weekly", value="1w"),
+            app_commands.Choice(name="Every 2 weeks", value="2w"),
+            app_commands.Choice(name="Monthly", value="1m"),
+            app_commands.Choice(name="Every 2 months", value="2m")
+        ]
+    )
+    @has_perm()
+    async def add_leaderboard_msg(
+            self,
+            interaction: Interaction,
+            duration: app_commands.Choice[str],
+            channel: discord.TextChannel = None
+    ):
+
+        if channel is None:
+            channel = interaction.channel
+
+        self.database.execute(
+            "INSERT INTO OSM_LEADERBOARD_AUTO_MSG (CHANNEL_ID,LAST_UPDATE,NEXT_UPDATE,UPDATE_EVERY) VALUES "
+            "(?,?,?,?);",
+            (
+                channel.id,
+                date_to_timestamp(datetime.date.today()),
+                date_to_timestamp(
+                    datetime.date.today() + datetime.timedelta(**transform_str_to_datetime_args(duration.value))
+                ),
+                duration.value
+            )
+        )
+
+        self.database.commit()
+
+        await interaction.response.send_message(
+            f"Successfully added an automatic message which will be sent {duration.name.lower()} in <#{channel.id}>",
+            ephemeral=True
+        )
+
+    # TODO: remove + list
+
+
     @tasks.loop(minutes=get_config("OSM.Leaderboard.UpdateTimeMin"))
     async def update_data(self):
         uids = [i[0] for i in self.database.execute("SELECT OSM_UID FROM OSM_LEADERBOARD_USERS;").fetchall()]
@@ -181,7 +241,7 @@ class OSM(commands.GroupCog):
                 (i.uid,)
             ).fetchone()
 
-            last_timestamps = datetime.fromtimestamp(cursor[0] + 1 if cursor is not None else 0)
+            last_timestamps = datetime.datetime.fromtimestamp(cursor[0] + 1 if cursor is not None else 0)
             last_changeset_nb = cursor[1] if cursor is not None else 0
             last_changes_nb = cursor[2] if cursor is not None else 0
 
@@ -227,6 +287,8 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
 # TODO: show map
 
 # TODO: admin manage users
+
+# TODO: add brief to every commands
 
 # TODO: When adding a user in DB, also fetch old changeset count + notes + nodes count
 # print(await get_notes_nb(py_osm, 14112053))
