@@ -14,7 +14,7 @@ from Cogs.Osm.GetChangesNotesNb import get_notes_nb, get_changes_nb
 from Cogs.Osm.Py_OSM_API import PyOSM, py_osm_builder
 from Cogs.Osm.RegisterUserViews import RegisterSelectSelector
 from Cogs.Osm.RemoveLeaderboardMsgViews import RemoveLeaderboardSelector
-from Cogs.Osm.TimeUtils import transform_str_to_datetime_args, date_to_timestamp
+from Cogs.Osm.TimeUtils import transform_str_to_datetime_args, date_to_timestamp, compact_str_to_human
 from Cogs.Osm.UnregisterUserViews import UnregisterView
 from GlobalModules.GetConfig import get_config
 from GlobalModules.HasPerm import has_perm
@@ -235,8 +235,30 @@ class Osm(commands.GroupCog):
         else:
             await interaction.response.send_message("You have no leaderboard message set", ephemeral=True)
 
-    # TODO: list
+    @app_commands.command(name="list_leaderboard_msg")
+    @app_commands.default_permissions(administrator=True)
+    @has_perm()
+    async def list_leaderboard_msg(self, interaction: Interaction):
+        entries = []
+        for channel_id, last_update, update_every in self.database.execute(
+                "SELECT CHANNEL_ID,LAST_UPDATE,UPDATE_EVERY FROM OSM_LEADERBOARD_AUTO_MSG WHERE GUILD_ID=?;",
+                (interaction.guild_id,)).fetchall():
+            entries.append(
+                f"- In <#{channel_id}> (`{channel_id}`)\n  - Last updated was on <t:{last_update}:F>\n  - Updates every"
+                f" `{compact_str_to_human(update_every)}`"
+            )
 
+        if len(entries):
+            e = discord.Embed(
+                title="Leaderboards in {}",
+                description="\n".join(entries),
+                color=get_config("core.base_embed_color")
+            )
+
+            await interaction.response.send_message(embed=e, ephemeral=True)
+
+        else:
+            await interaction.response.send_message("There are no leaderboard set in this guild.", ephemeral=True)
 
     @tasks.loop(minutes=get_config("OSM.Leaderboard.UpdateTimeMin"))
     async def update_data(self):
