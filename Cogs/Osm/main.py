@@ -322,14 +322,10 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
     py_osm = await py_osm_builder()
     await bot.add_cog(Osm(bot, database, py_osm))
 
-# TODO: Leaderboard
+# TODO: Leaderboard => Send leaderboard
 # TODO: Search element
 # TODO: show map
 
 # TODO: admin manage users
 
 # TODO: add brief to every commands
-
-# TODO: When adding a user in DB, also fetch old changeset count + notes + nodes count
-# print(await get_notes_nb(py_osm, 14112053))
-# print(await get_changes_nb(py_osm, 14112053))
