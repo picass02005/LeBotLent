@@ -1,8 +1,8 @@
 import sqlite3
 import time
 
-from Cogs.OSM.GetChangesNotesNb import get_notes_nb, get_changes_nb
-from Cogs.OSM.Py_OSM_API import OSMUser, PyOSM
+from Cogs.Osm.GetChangesNotesNb import get_notes_nb, get_changes_nb
+from Cogs.Osm.Py_OSM_API import OSMUser, PyOSM
 
 
 async def register_user_in_db(disc_uid: int, guild_id: int, osm_user: OSMUser, py_osm: PyOSM, db: sqlite3.Connection):

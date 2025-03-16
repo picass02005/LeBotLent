@@ -10,17 +10,18 @@ import discord
 from discord import app_commands, Interaction
 from discord.ext import commands, tasks
 
-from Cogs.OSM.GetChangesNotesNb import get_notes_nb, get_changes_nb
-from Cogs.OSM.Py_OSM_API import PyOSM, py_osm_builder
-from Cogs.OSM.RegisterUserViews import RegisterSelectSelector
-from Cogs.OSM.TimeUtils import transform_str_to_datetime_args, date_to_timestamp
-from Cogs.OSM.UnregisterUserViews import UnregisterView
+from Cogs.Osm.GetChangesNotesNb import get_notes_nb, get_changes_nb
+from Cogs.Osm.Py_OSM_API import PyOSM, py_osm_builder
+from Cogs.Osm.RegisterUserViews import RegisterSelectSelector
+from Cogs.Osm.RemoveLeaderboardMsgViews import RemoveLeaderboardSelector
+from Cogs.Osm.TimeUtils import transform_str_to_datetime_args, date_to_timestamp
+from Cogs.Osm.UnregisterUserViews import UnregisterView
 from GlobalModules.GetConfig import get_config
 from GlobalModules.HasPerm import has_perm
 
 
 # === DO NOT CHANGE CLASS NAME OR __init__ PARAMETERS === #
-class OSM(commands.GroupCog):
+class Osm(commands.GroupCog):
     def __init__(self, bot: commands.AutoShardedBot, database: sqlite3.Connection, py_osm: PyOSM):
         self.bot: bot = bot
         self.database = database
@@ -57,6 +58,7 @@ class OSM(commands.GroupCog):
 
         self.database.execute(
             "CREATE TABLE IF NOT EXISTS OSM_LEADERBOARD_AUTO_MSG ("
+            "GUILD_ID INTEGER,"
             "CHANNEL_ID INTEGER,"
             "LAST_UPDATE INTEGER,"
             "NEXT_UPDATE INTEGER,"
@@ -198,9 +200,10 @@ class OSM(commands.GroupCog):
             channel = interaction.channel
 
         self.database.execute(
-            "INSERT INTO OSM_LEADERBOARD_AUTO_MSG (CHANNEL_ID,LAST_UPDATE,NEXT_UPDATE,UPDATE_EVERY) VALUES "
-            "(?,?,?,?);",
+            "INSERT INTO OSM_LEADERBOARD_AUTO_MSG (GUILD_ID,CHANNEL_ID,LAST_UPDATE,NEXT_UPDATE,UPDATE_EVERY) VALUES "
+            "(?,?,?,?,?);",
             (
+                channel.guild.id,
                 channel.id,
                 date_to_timestamp(datetime.date.today()),
                 date_to_timestamp(
@@ -217,7 +220,22 @@ class OSM(commands.GroupCog):
             ephemeral=True
         )
 
-    # TODO: remove + list
+    @app_commands.command(name="rm_leaderboard_msg")
+    @app_commands.default_permissions(administrator=True)
+    @has_perm()
+    async def rm_leaderboard_msg(self, interaction: Interaction):
+        selector = RemoveLeaderboardSelector(interaction.user, interaction.guild, self.database)
+
+        if len(selector.options):
+            view = discord.ui.View()
+            view.add_item(selector)
+
+            await interaction.response.send_message("Select a leaderboard to delete", view=view, ephemeral=True)
+
+        else:
+            await interaction.response.send_message("You have no leaderboard message set", ephemeral=True)
+
+    # TODO: list
 
 
     @tasks.loop(minutes=get_config("OSM.Leaderboard.UpdateTimeMin"))
@@ -280,7 +298,7 @@ class OSM(commands.GroupCog):
 
 async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
     py_osm = await py_osm_builder()
-    await bot.add_cog(OSM(bot, database, py_osm))
+    await bot.add_cog(Osm(bot, database, py_osm))
 
 # TODO: Leaderboard
 # TODO: Search element

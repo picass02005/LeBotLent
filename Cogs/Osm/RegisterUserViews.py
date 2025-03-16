@@ -4,9 +4,9 @@ from typing import Any
 import discord
 from discord import Interaction
 
-from Cogs.OSM.Py_OSM_API import OSMUser
-from Cogs.OSM.Py_OSM_API import PyOSM
-from Cogs.OSM.RegisterUserInDB import register_user_in_db
+from Cogs.Osm.Py_OSM_API import OSMUser
+from Cogs.Osm.Py_OSM_API import PyOSM
+from Cogs.Osm.RegisterUserInDB import register_user_in_db
 from GlobalModules.GetConfig import get_config
 
 

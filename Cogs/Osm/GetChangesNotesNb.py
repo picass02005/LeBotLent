@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from Cogs.OSM.Py_OSM_API import PyOSM, OSMTimeDelta, OSMSort, OSMOrder, OSMStatus
+from Cogs.Osm.Py_OSM_API import PyOSM, OSMTimeDelta, OSMSort, OSMOrder, OSMStatus
 
 
 async def get_changes_nb(py_osm: PyOSM, uid: int, from_date: datetime = None) -> int:

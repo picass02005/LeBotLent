@@ -31,5 +31,16 @@
         "group": [
             "bots_admin"
         ]
+    },
+    "rm_leaderboard_msg": {
+        "roles": [],
+        "users": [],
+        "permission_code": [
+            8
+        ],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
     }
 }

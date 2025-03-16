@@ -5,7 +5,7 @@ from typing import Any, Tuple
 import discord.ui
 from discord import Interaction
 
-from Cogs.OSM.Py_OSM_API import OSMUser
+from Cogs.Osm.Py_OSM_API import OSMUser
 
 
 class UnregisterView(discord.ui.View):
