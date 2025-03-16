@@ -5,7 +5,7 @@ from typing import Any
 import discord
 from discord import Interaction
 
-from Cogs.Osm.TimeUtils import transform_str_to_datetime_args
+from Cogs.Osm.TimeUtils import compact_str_to_human
 
 
 class RemoveLeaderboardSelector(discord.ui.Select):
@@ -23,15 +23,14 @@ class RemoveLeaderboardSelector(discord.ui.Select):
         for channel_id, last_update, update_every in self.db.execute(
                 "SELECT CHANNEL_ID,LAST_UPDATE,UPDATE_EVERY FROM OSM_LEADERBOARD_AUTO_MSG WHERE GUILD_ID=?;",
                 (self.guild.id,)).fetchall():
-            update_every_human = ' '.join([f"{v} {k}" for k, v in transform_str_to_datetime_args(update_every).items()])
 
             channel_name = self.guild.get_channel(channel_id)
 
             ret.append(
                 discord.SelectOption(
                     label=f"In #{channel_name} | {channel_id}",
-                    value=f"{channel_id},{last_update},{update_every},{update_every_human}",
-                    description=f"Every {update_every_human}, last update was on "
+                    value=f"{channel_id},{last_update},{update_every}",
+                    description=f"Every {compact_str_to_human(update_every)}, last update was on "
                                 f"{datetime.datetime.fromtimestamp(last_update).strftime('%d/%m')} [DD/MM]"
                 )
             )
@@ -45,7 +44,6 @@ class RemoveLeaderboardSelector(discord.ui.Select):
         channel_id = int(inte.data['values'][0].split(",")[0])
         last_update = int(inte.data['values'][0].split(",")[1])
         update_every = inte.data['values'][0].split(",")[2]
-        update_every_human = inte.data['values'][0].split(",")[3]
 
         self.db.execute(
             "DELETE FROM OSM_LEADERBOARD_AUTO_MSG WHERE GUILD_ID=? AND CHANNEL_ID=? AND LAST_UPDATE=? AND "
@@ -61,7 +59,7 @@ class RemoveLeaderboardSelector(discord.ui.Select):
         await inte.response.edit_message(view=view)
 
         await inte.followup.send(
-            f"Successfully removed leaderboard send in <#{channel_id}> every {update_every_human} and which was last "
-            f"sent on <t:{last_update}:F>",
+            f"Successfully removed leaderboard send in <#{channel_id}> every {compact_str_to_human(update_every)} and "
+            f"which was last sent on <t:{last_update}:F>",
             ephemeral=True
         )

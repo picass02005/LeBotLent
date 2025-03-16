@@ -30,3 +30,16 @@ def transform_str_to_datetime_args(text: str) -> Dict[str, int]:
 
 def date_to_timestamp(date: datetime.date) -> int:
     return int(datetime.datetime.combine(date, datetime.time(tzinfo=datetime.timezone.utc)).timestamp())
+
+
+def compact_str_to_human(compact_str: str) -> str:
+    ret = []
+
+    for k, v in transform_str_to_datetime_args(compact_str).items():
+        if v == 1:
+            ret.append(f"{v} {k[:-1]}")
+
+        else:
+            ret.append(f"{v} {k}")
+
+    return ' '.join(ret)
