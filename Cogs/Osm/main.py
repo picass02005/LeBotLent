@@ -30,10 +30,10 @@ class Osm(commands.GroupCog):
 
         self.check_db()
 
-        self.update_data.start()
+        self.update_data_task.start()
 
     def cog_unload(self) -> None:
-        self.update_data.stop()
+        self.update_data_task.stop()
 
     def check_db(self):
         self.database.execute(
@@ -261,6 +261,10 @@ class Osm(commands.GroupCog):
             await interaction.response.send_message("There are no leaderboard set in this guild.", ephemeral=True)
 
     @tasks.loop(minutes=get_config("OSM.Leaderboard.UpdateTimeMin"))
+    async def update_data_task(self):
+        await self.update_data()
+
+
     async def update_data(self):
         uids = [i[0] for i in self.database.execute("SELECT OSM_UID FROM OSM_LEADERBOARD_USERS;").fetchall()]
 
