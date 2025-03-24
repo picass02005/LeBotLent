@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: MIT
+# Copyright (C) 2025 picasso2005 <clementduran0@gmail.com> - All Rights Reserved
+
 import sqlite3
 from typing import Any
 
