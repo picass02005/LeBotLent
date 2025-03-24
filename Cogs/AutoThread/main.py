@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: MIT
+# Copyright (C) 2024 picasso2005 <clementduran0@gmail.com> - All Rights Reserved
+
+import asyncio
 import sqlite3
 
 import discord
@@ -207,6 +211,7 @@ class AutoThread(commands.GroupCog):
     async def thread_react(message: discord.Message):
         for i in (127481, 127469, 127479, 127466, 127462, 127465):
             await message.add_reaction(chr(i))
+            await asyncio.sleep(0.5)
 
 
     @commands.Cog.listener()
@@ -215,7 +220,7 @@ class AutoThread(commands.GroupCog):
             return
 
         if message.channel.id in self.__config:
-            if (len(message.attachments) or "http" in message.content) and not message.author.id == 312926990888075264:
+            if len(message.attachments) or "http" in message.content:
                 await self.__make_thread(message)
 
             elif len(

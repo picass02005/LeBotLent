@@ -1,9 +1,14 @@
+# SPDX-License-Identifier: MIT
+# Copyright (C) 2024 picasso2005 <clementduran0@gmail.com> - All Rights Reserved
+
 """
     The following script is used to generate a new cog or permission files
 """
+
 import json
 import os
 import time
+from datetime import date
 from typing import Union, Callable
 
 
@@ -99,6 +104,8 @@ def generate_cog(cog_name: str):
 
     with open(f"Cogs/{cog_name}/main.py", "w") as f:
         f.write(
+            f"# SPDX-License-Identifier: MIT\n"
+            f"# Copyright (C) {date.today().year} picasso2005 <clementduran0@gmail.com> - All Rights Reserved\n\n"
             f"import sqlite3\n\n"
             f"from discord import app_commands\n"
             f"from discord.ext import commands\n\n"

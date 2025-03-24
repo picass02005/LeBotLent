@@ -1,0 +1,47 @@
+{
+    "register_user": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "unregister_user": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "add_leaderboard_msg": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "rm_leaderboard_msg": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "list_leaderboard_msg": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    }
+}
