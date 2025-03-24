@@ -11,11 +11,14 @@ from discord import app_commands, Interaction
 from discord.ext import commands, tasks
 
 from Cogs.Osm.GetChangesNotesNb import get_notes_nb, get_changes_nb
+from Cogs.Osm.Leaderboard import make_leaderboard_embed
 from Cogs.Osm.Py_OSM_API import PyOSM, py_osm_builder
 from Cogs.Osm.RegisterUserViews import RegisterSelectSelector
 from Cogs.Osm.RemoveLeaderboardMsgViews import RemoveLeaderboardSelector
-from Cogs.Osm.TimeUtils import transform_str_to_datetime_args, date_to_timestamp, compact_str_to_human
+from Cogs.Osm.TimeUtils import transform_str_to_datetime_args, date_to_timestamp, compact_str_to_human, \
+    wait_specific_time
 from Cogs.Osm.UnregisterUserViews import UnregisterView
+from Core.IsTestVersion import is_test_version
 from GlobalModules.GetConfig import get_config
 from GlobalModules.HasPerm import has_perm
 
@@ -31,9 +34,11 @@ class Osm(commands.GroupCog):
         self.check_db()
 
         self.update_data_task.start()
+        self.send_leaderboards_task.start()
 
     def cog_unload(self) -> None:
         self.update_data_task.stop()
+        self.send_leaderboards_task.stop()
 
     def check_db(self):
         self.database.execute(
@@ -184,8 +189,8 @@ class Osm(commands.GroupCog):
             app_commands.Choice(name="Every 6 days", value="6d"),
             app_commands.Choice(name="Weekly", value="1w"),
             app_commands.Choice(name="Every 2 weeks", value="2w"),
-            app_commands.Choice(name="Monthly", value="1m"),
-            app_commands.Choice(name="Every 2 months", value="2m")
+            app_commands.Choice(name="Monthly", value="30d"),
+            app_commands.Choice(name="Every 2 months", value="60d")
         ]
     )
     @has_perm()
@@ -319,6 +324,45 @@ class Osm(commands.GroupCog):
 
         self.database.commit()
 
+    @tasks.loop(hours=23, minutes=50)
+    async def send_leaderboards_task(self):
+        if not is_test_version():
+            await wait_specific_time(0, 0, 0)
+
+        await self.update_data()
+
+        for i in self.database.execute(
+                "SELECT CHANNEL_ID, LAST_UPDATE, UPDATE_EVERY FROM OSM_LEADERBOARD_AUTO_MSG WHERE NEXT_UPDATE <= ?;",
+                (int(time.time()) - 500,)  # 500 seconds to be sure to catch everything
+        ).fetchall():
+
+            channel = await self.bot.fetch_channel(i[0])
+            last_update = i[1]
+            next_update = date_to_timestamp(
+                datetime.date.today() + datetime.timedelta(**transform_str_to_datetime_args(i[2]))
+            )
+
+            if channel is None:
+                continue
+
+            e = make_leaderboard_embed(self.database, channel.guild, last_update)
+
+            await channel.send(embed=e)
+
+            self.database.execute(
+                "UPDATE OSM_LEADERBOARD_AUTO_MSG SET LAST_UPDATE=?, NEXT_UPDATE=? WHERE CHANNEL_ID=? AND "
+                "LAST_UPDATE=? AND UPDATE_EVERY=?;",
+                (
+                    date_to_timestamp(datetime.datetime.now(tz=datetime.timezone.utc)),
+                    next_update,
+                    channel.id,
+                    last_update,
+                    i[2]
+                )
+            )
+            self.database.commit()
+
+
 
 # === DO NOT REMOVE THE FOLLOWING OR CHANGE PARAMETERS === #
 
@@ -326,7 +370,7 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
     py_osm = await py_osm_builder()
     await bot.add_cog(Osm(bot, database, py_osm))
 
-# TODO: Leaderboard => Send leaderboard
+# TODO: leaderboard command
 # TODO: Search element
 # TODO: show map
 

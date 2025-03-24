@@ -3,6 +3,7 @@
 
 import asyncio
 import datetime
+from datetime import timezone
 from typing import Dict
 
 
@@ -15,8 +16,7 @@ def transform_str_to_datetime_args(text: str) -> Dict[str, int]:
                 key = "days"
             case "w":
                 key = "weeks"
-            case "m":
-                key = "months"
+
             case _:
                 key = None
 
@@ -47,3 +47,22 @@ def compact_str_to_human(compact_str: str) -> str:
             ret.append(f"{v} {k}")
 
     return ' '.join(ret)
+
+
+async def wait_specific_time(hours: int = 0, minutes: int = 0, seconds: int = 0) -> None:
+    """
+    Wait until a precize time (in UTC)
+    :param hours: Hours
+    :param minutes: Minutes
+    :param seconds: Seconds
+    :return: None
+    """
+
+    given_time = datetime.time(hours, minutes, seconds, tzinfo=timezone.utc)
+    now = datetime.datetime.now(tz=timezone.utc)
+    future_exec = datetime.datetime.combine(now, given_time)
+
+    if (future_exec - now).days < 0:  # If we are past the execution, it will take place tomorrow
+        future_exec = datetime.datetime.combine(now + datetime.timedelta(days=1), given_time)  # days always >= 0
+
+    await asyncio.sleep((future_exec - now).total_seconds())
