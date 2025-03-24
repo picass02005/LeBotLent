@@ -86,8 +86,8 @@ def make_leaderboard_embed(db: sqlite3.Connection, guild: discord.Guild, since: 
 
     else:
         values = []
-        for i, e in enumerate(reversed(leaderboard[:10])):
-            values.append(f"{i}. {e.OSM_name} [`{e.Score} points`] "
+        for i, e in enumerate(leaderboard[:10]):
+            values.append(f"{i}. <@{e.Discord_ID}> / {e.OSM_name} [`{e.Score} points`] "
                           f"({', '.join([j[0] + ": `" + str(j[1]) + "`" for j in (
                               ('Changes', e.Changes_nb),
                               ('Notes', e.Notes_nb),
