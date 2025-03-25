@@ -265,7 +265,7 @@ class Osm(commands.GroupCog):
         else:
             await interaction.response.send_message("There are no leaderboard set in this guild.", ephemeral=True)
 
-    @tasks.loop(minutes=get_config("OSM.Leaderboard.UpdateTimeMin"))
+    @tasks.loop(minutes=get_config("Osm.Leaderboard.UpdateTimeMin"))
     async def update_data_task(self):
         await self.update_data()
 
@@ -319,7 +319,7 @@ class Osm(commands.GroupCog):
 
         self.database.execute(
             "DELETE FROM OSM_LEADERBOARD_DATA WHERE TIMESTAMP < ?;",
-            (ts - get_config("OSM.Leaderboard.DeleteAfter"),)
+            (ts - get_config("Osm.Leaderboard.DeleteAfter"),)
         )
 
         self.database.commit()
