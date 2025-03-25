@@ -1,3 +1,3 @@
-[submodule "Cogs/OSM/Py_OSM_Api"]
-	path = Cogs/OSM/Py_OSM_Api
+[submodule "Cogs/Osm/Py_OSM_Api"]
+	path = Cogs/Osm/Py_OSM_Api
 	url = https://github.com/picass02005/Py_OSM_API.git
