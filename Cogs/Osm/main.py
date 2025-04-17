@@ -370,7 +370,9 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
     py_osm = await py_osm_builder()
     await bot.add_cog(Osm(bot, database, py_osm))
 
-# TODO: leaderboard command
+# FIXME: When a new changeset occurs, changeNB is overwritten insted of added value
+# => https://discordapp.com/channels/1309590337832095805/1309590337832095808/1362215699359072436
+
 # TODO: Search element
 # TODO: show map
 
