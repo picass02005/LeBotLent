@@ -285,7 +285,7 @@ class Osm(commands.GroupCog):
 
         for i in users:
             cursor = self.database.execute(
-                "SELECT TIMESTAMP, CHANGESET_NB, CHANGES_NB FROM OSM_LEADERBOARD_DATA "
+                "SELECT TIMESTAMP, CHANGESET_NB, CHANGES_NB, NOTES_NB FROM OSM_LEADERBOARD_DATA "
                 "WHERE OSM_UID=? ORDER BY TIMESTAMP DESC LIMIT 1;",
                 (i.uid,)
             ).fetchone()
@@ -293,14 +293,15 @@ class Osm(commands.GroupCog):
             last_timestamps = datetime.datetime.fromtimestamp(cursor[0] + 1 if cursor is not None else 0)
             last_changeset_nb = cursor[1] if cursor is not None else 0
             last_changes_nb = cursor[2] if cursor is not None else 0
+            last_notes_nb = cursor[3] if cursor is not None else 0
 
             if i.changesets_count != last_changeset_nb:
-                changes_nb = await get_changes_nb(self.py_osm, i.uid, last_timestamps)
+                changes_nb = await get_changes_nb(self.py_osm, i.uid, last_timestamps) + last_changes_nb
 
             else:
                 changes_nb = last_changes_nb
 
-            notes_nb = await get_notes_nb(self.py_osm, i.uid, last_timestamps)
+            notes_nb = await get_notes_nb(self.py_osm, i.uid, last_timestamps) + last_notes_nb
 
             self.database.execute(
                 "INSERT INTO OSM_LEADERBOARD_DATA (TIMESTAMP, OSM_UID, CHANGESET_NB, CHANGES_NB, NOTES_NB, "
@@ -369,9 +370,6 @@ class Osm(commands.GroupCog):
 async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
     py_osm = await py_osm_builder()
     await bot.add_cog(Osm(bot, database, py_osm))
-
-# FIXME: When a new changeset occurs, changeNB is overwritten insted of added value
-# => https://discordapp.com/channels/1309590337832095805/1309590337832095808/1362215699359072436
 
 # TODO: Search element
 # TODO: show map
