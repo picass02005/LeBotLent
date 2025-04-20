@@ -1,0 +1,311 @@
+{
+  "1A_GENERAL": {
+    "Name": "1A - G\u00e9n\u00e9ral",
+    "Year": 1,
+    "Department": "STPI",
+    "PO": null,
+    "Speciality": null,
+    "Next": [
+      "2A_IC",
+      "2A_ICBE",
+      "2A_IMACS",
+      "2A_MIC"
+    ],
+    "Similar": []
+  },
+  "1A_FAS": {
+    "Name": "1A - FAS",
+    "Year": 1,
+    "Department": "STPI",
+    "PO": null,
+    "Speciality": null,
+    "Next": [
+      "2A_FAS_CONSTRUCTION",
+      "2A_FAS_NUM"
+    ],
+    "Similar": []
+  },
+  "2A_IC": {
+    "Name": "2A - Ing\u00e9nierie de la Construction",
+    "Year": 2,
+    "Department": "STPI",
+    "PO": "IC",
+    "Speciality": null,
+    "Next": [
+      "3A_IC"
+    ],
+    "Similar": [
+      "2A_FAS_CONSTRUCTION"
+    ]
+  },
+  "2A_ICBE": {
+    "Name": "2A - Ing\u00e9nierie Chimique Biochimique et Environnementale",
+    "Year": 2,
+    "Department": "STPI",
+    "PO": "ICBE",
+    "Speciality": null,
+    "Next": [
+      "3A_ICBE"
+    ],
+    "Similar": []
+  },
+  "2A_IMACS": {
+    "Name": "2A - Ing\u00e9nierie des Mat\u00e9riaux, Composants et Syst\u00e8mes",
+    "Year": 2,
+    "Department": "STPI",
+    "PO": "IMACS",
+    "Speciality": null,
+    "Next": [
+      "3A_IMACS"
+    ],
+    "Similar": []
+  },
+  "2A_MIC": {
+    "Name": "2A - Mod\u00e9lisation, Informatique, Communication",
+    "Year": 2,
+    "Department": "STPI",
+    "PO": "MIC",
+    "Speciality": null,
+    "Next": [
+      "3A_MIC"
+    ],
+    "Similar": [
+      "2A_FAS_NUM"
+    ]
+  },
+  "2A_FAS_CONSTRUCTION": {
+    "Name": "2A - FAS Construction",
+    "Year": 2,
+    "Department": "STPI",
+    "PO": "IC",
+    "Speciality": null,
+    "Next": [
+      "3A_IC"
+    ],
+    "Similar": [
+      "2A_IC"
+    ]
+  },
+  "2A_FAS_NUM": {
+    "Name": "2A - FAS Num\u00e9rique",
+    "Year": 2,
+    "Department": "STPI",
+    "PO": "MIC",
+    "Speciality": null,
+    "Next": [
+      "3A_MIC",
+      "3A_IMACS"
+    ],
+    "Similar": [
+      "2A_MIC"
+    ]
+  },
+  "3A_IC": {
+    "Name": "3A - Ing\u00e9nierie de la Construction",
+    "Year": 3,
+    "Department": "STPI",
+    "PO": "IC",
+    "Speciality": null,
+    "Next": [
+      "4A_GC",
+      "4A_GM"
+    ],
+    "Similar": []
+  },
+  "3A_ICBE": {
+    "Name": "3A - Ing\u00e9nierie Chimique Biochimique et Environnementale",
+    "Year": 3,
+    "Department": "STPI",
+    "PO": "ICBE",
+    "Speciality": null,
+    "Next": [
+      "4A_GB",
+      "4A_GP3E"
+    ],
+    "Similar": []
+  },
+  "3A_IMACS": {
+    "Name": "3A - Ing\u00e9nierie des Mat\u00e9riaux, Composants et Syst\u00e8mes",
+    "Year": 3,
+    "Department": "STPI",
+    "PO": "IMACS",
+    "Speciality": null,
+    "Next": [
+      "4A_AE",
+      "4A_GP"
+    ],
+    "Similar": []
+  },
+  "3A_MIC": {
+    "Name": "2A - Mod\u00e9lisation, Informatique, Communication",
+    "Year": 3,
+    "Department": "STPI",
+    "PO": "MIC",
+    "Speciality": null,
+    "Next": [
+      "4A_MA",
+      "4A_IR"
+    ],
+    "Similar": []
+  },
+  "4A_GC": {
+    "Name": "4A - G\u00e9nie Civil",
+    "Year": 4,
+    "Department": "GC",
+    "PO": "IC",
+    "Speciality": "GC",
+    "Next": [
+      "5A_GC"
+    ],
+    "Similar": []
+  },
+  "4A_GM": {
+    "Name": "4A - G\u00e9nie M\u00e9canique",
+    "Year": 4,
+    "Department": "GM",
+    "PO": "IC",
+    "Speciality": "GM",
+    "Next": [
+      "5A_GM"
+    ],
+    "Similar": []
+  },
+  "4A_GB": {
+    "Name": "4A - G\u00e9nie Biologique",
+    "Year": 4,
+    "Department": "GB",
+    "PO": "ICBE",
+    "Speciality": "GB",
+    "Next": [
+      "5A_GB"
+    ],
+    "Similar": []
+  },
+  "4A_GP3E": {
+    "Name": "4A - G\u00e9nie des Proc\u00e9d\u00e9s: Eau Energie Environnement",
+    "Year": 4,
+    "Department": "GPE",
+    "PO": "ICBE",
+    "Speciality": "GP3E",
+    "Next": [
+      "5A_GP3E"
+    ],
+    "Similar": []
+  },
+  "4A_AE": {
+    "Name": "4A - Automatique Electronique",
+    "Year": 4,
+    "Department": "GEI",
+    "PO": "IMACS",
+    "Speciality": "AE",
+    "Next": [
+      "5A_AE"
+    ],
+    "Similar": []
+  },
+  "4A_GP": {
+    "Name": "4A - G\u00e9nie Physique",
+    "Year": 4,
+    "Department": "GP",
+    "PO": "IMAC",
+    "Speciality": "GP",
+    "Next": [
+      "5A_GP"
+    ],
+    "Similar": []
+  },
+  "4A_MA": {
+    "Name": "4A - Math\u00e9matiques Appliqu\u00e9es",
+    "Year": 4,
+    "Department": "GMM",
+    "PO": "MIC",
+    "Speciality": "MA",
+    "Next": [
+      "5A_MA"
+    ],
+    "Similar": []
+  },
+  "4A_IR": {
+    "Name": "4A - Informatique et R\u00e9seaux",
+    "Year": 4,
+    "Department": "GEI",
+    "PO": "MIC",
+    "Speciality": "IR",
+    "Next": [
+      "5A_IR"
+    ],
+    "Similar": []
+  },
+  "5A_GC": {
+    "Name": "5A - G\u00e9nie Civil",
+    "Year": 5,
+    "Department": "GC",
+    "PO": "IC",
+    "Speciality": "GC",
+    "Next": [],
+    "Similar": []
+  },
+  "5A_GM": {
+    "Name": "5A - G\u00e9nie M\u00e9canique",
+    "Year": 5,
+    "Department": "GM",
+    "PO": "IC",
+    "Speciality": "GM",
+    "Next": [],
+    "Similar": []
+  },
+  "5A_GB": {
+    "Name": "5A - G\u00e9nie Biologique",
+    "Year": 5,
+    "Department": "GB",
+    "PO": "ICBE",
+    "Speciality": "GB",
+    "Next": [],
+    "Similar": []
+  },
+  "5A_GP3E": {
+    "Name": "5A - G\u00e9nie des Proc\u00e9d\u00e9s: Eau Energie Environnement",
+    "Year": 5,
+    "Department": "GPE",
+    "PO": "ICBE",
+    "Speciality": "GP3E",
+    "Next": [],
+    "Similar": []
+  },
+  "5A_AE": {
+    "Name": "5A - Automatique Electronique",
+    "Year": 5,
+    "Department": "GEI",
+    "PO": "IMACS",
+    "Speciality": "AE",
+    "Next": [],
+    "Similar": []
+  },
+  "5A_GP": {
+    "Name": "5A - G\u00e9nie Physique",
+    "Year": 5,
+    "Department": "GP",
+    "PO": "IMAC",
+    "Speciality": "GP",
+    "Next": [],
+    "Similar": []
+  },
+  "5A_MA": {
+    "Name": "5A - Math\u00e9matiques Appliqu\u00e9es",
+    "Year": 5,
+    "Department": "GMM",
+    "PO": "MIC",
+    "Speciality": "MA",
+    "Next": [],
+    "Similar": []
+  },
+  "5A_IR": {
+    "Name": "5A - Informatique et R\u00e9seaux",
+    "Year": 5,
+    "Department": "GEI",
+    "PO": "MIC",
+    "Speciality": "IR",
+    "Next": [],
+    "Similar": []
+  }
+}
