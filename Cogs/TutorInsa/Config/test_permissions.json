@@ -1,8 +1,21 @@
 {
-    "command_name_here": {
+    "add_class_role": {
         "roles": [],
         "users": [],
-        "permission_code": [],
+        "permission_code": [
+            8
+        ],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "remove_class_role": {
+        "roles": [],
+        "users": [],
+        "permission_code": [
+            8
+        ],
         "guilds": [],
         "group": [
             "bots_admin"

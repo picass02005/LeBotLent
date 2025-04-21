@@ -30,6 +30,9 @@ class BaseTransformer(app_commands.Transformer):
         priority = [(k, k.count(value)) for k in self.cache.keys() if self.check_validity(k)]
         priority.sort(key=lambda x: x[1], reverse=True)
 
+        if len(priority) == 0:
+            return ["UNDEFINED"]
+
         if priority[0][1] > 0:
             priority = [i for i in priority if i[1] > 0]
 
@@ -81,6 +84,35 @@ class AddClassRoleTransformer(BaseTransformer):
         ).fetchall()]
 
         self.valid = [i for i in self.cache.keys() if i not in inside]
+
+    def autocomplete_before(self, interaction: Interaction, value: str) -> None:
+        if self.guild_id != interaction.guild_id or not value:
+            self.guild_id = interaction.guild_id
+            self.update_valid()
+
+    def transform_before(self, interaction: Interaction, value: str) -> None:
+        self.update_valid()
+
+    def check_validity(self, key: str) -> bool:
+        return key in self.valid
+
+
+class RemoveClassRoleTransformer(BaseTransformer):
+    def __init__(self, db: List[sqlite3.Connection]):
+        super().__init__()
+
+        self.db_list = db
+
+        self.valid: List[str] = []
+        self.guild_id: int = 0
+
+    def update_valid(self):
+        db = self.db_list[0]
+
+        self.valid = [i[0] for i in db.execute(
+            "SELECT CLASS FROM TUTOR_ROLES WHERE GUILD_ID=?;",
+            (self.guild_id,)
+        ).fetchall()]
 
     def autocomplete_before(self, interaction: Interaction, value: str) -> None:
         if self.guild_id != interaction.guild_id or not value:
