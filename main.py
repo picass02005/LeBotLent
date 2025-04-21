@@ -65,6 +65,7 @@ async def setup_hook() -> None:
 
     remove_old_paginator.start()
     clear_temp_files.start()
+    purge_logs.start()
 
 
 @bot.event
@@ -114,9 +115,18 @@ async def remove_old_paginator():
         await Paginator(database).remove_paginator(msg)
 
 
-@tasks.loop(minutes=1)
+@tasks.loop(minutes=30)
 async def clear_temp_files():
     TempManager.purge_temp()
+
+
+@tasks.loop(hours=6)
+async def purge_logs():
+    database.execute(
+        "DELETE FROM LOGS WHERE TIMESTAMP<?;",
+        (int(time.time()) - get_config("core.logs_delete_after"),)
+    )
+    database.commit()
 
 
 cogManager = CogManager(bot, database)
