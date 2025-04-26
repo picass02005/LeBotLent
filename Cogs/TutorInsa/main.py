@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: MIT
 # Copyright (C) 2025 picasso2005 <clementduran0@gmail.com> - All Rights Reserved
-
+import json
 import sqlite3
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 
 import discord
 from discord import app_commands, Interaction
@@ -12,6 +12,7 @@ from Cogs.TutorInsa.Transformers.add_rm_class_role import AddClassRoleTransforme
 from Cogs.TutorInsa.Types.ClassEntry import ClassEntry
 from GlobalModules.GetConfig import get_config
 from GlobalModules.HasPerm import has_perm
+from GlobalModules.Paginator import Paginator
 
 PTR_DB: List[sqlite3.Connection] = []
 
@@ -124,7 +125,101 @@ class TutorInsa(commands.GroupCog):
             ephemeral=True
         )
 
-    # TODO: List
+    @app_commands.command(name="list_class_role", description="List all class role association in database")
+    @app_commands.default_permissions(administrator=True)
+    @has_perm()
+    async def list_class_role(self, interaction: Interaction):
+        with open("Cogs/TutorInsa/Config/classes.json", "r") as f:
+            classes_json = json.loads(f.read())
+
+        by_years: Dict[int, List[Tuple[ClassEntry, int]]] = dict()
+        unassigned: List[str] = list(classes_json.keys())
+
+        for i in self.database.execute(
+                "SELECT CLASS, ROLE_ID FROM TUTOR_ROLES WHERE GUILD_ID=?;",
+                (interaction.guild_id,)
+        ).fetchall():
+            if i[0] in classes_json.keys():
+                entry = ClassEntry(classes_json[i[0]])
+                unassigned.remove(i[0])
+
+                if entry.year in by_years.keys():
+                    by_years[entry.year].append((entry, i[1]))
+
+                else:
+                    by_years.update({entry.year: [(entry, i[1])]})
+
+            else:
+                await interaction.response.send_message(
+                    "There was an error while reading database, please contact picasso2005 / `clementduran0@gmail.com`",
+                    ephemeral=True
+                )
+                return
+
+        paginator = Paginator(self.database)
+        guild_no_cache = await self.bot.fetch_guild(interaction.guild_id)
+
+        for k, v in by_years.items():
+            e = discord.Embed(
+                title=f"Year {k}",
+                description=f"List of classes / roles associations currently registered for year {k}"
+            )
+
+            for i in v:
+                entry = i[0]
+                role_id = i[1]
+                role = guild_no_cache.get_role(role_id)
+                e.add_field(
+                    name=entry.name,
+                    value=f"Role: `{role_id} | {role.name if role is not None else "NAME ERROR"}`\n"
+                          f"Department: {entry.department}\n"
+                          f"PO: {entry.po}\n"
+                          f"Speciality: {entry.speciality}",
+                    inline=True
+                )
+
+            paginator.add_page(e, page_name=f"Year {k}")
+
+        if unassigned:
+            max_unassigned = len(unassigned) // 10
+            for j in range(max_unassigned + 1):
+                page_nb = f"({j + 1}/{max_unassigned + 1})" if max_unassigned > 0 else ""
+                e = discord.Embed(
+                    title=f"Unassigned classes {page_nb}",
+                    description="List of classes which are associated with no roles",
+                    color=0xFF0000
+                )
+
+                for i in unassigned[10 * j:10 * (j + 1)]:
+                    entry = ClassEntry(classes_json[i])
+                    e.add_field(
+                        name=entry.name,
+                        value=f"Department: {entry.department}\n"
+                              f"PO: {entry.po}\n"
+                              f"Speciality: {entry.speciality}",
+                        inline=True
+                    )
+
+                paginator.add_page(e, page_name=f"Unassigned {page_nb}")
+
+        if unassigned:
+            kwargs = {"content": f"# WARNING\n"
+                                 f"You have {len(unassigned)} classes not assigned.\n"
+                                 f"A list of them is present in the lasts pages."}
+
+        else:
+            kwargs = dict()
+
+        await paginator.send_paginator(
+            interaction,
+            ephemeral=True,
+            **kwargs
+        )
+
+    # TODO: Send message to let anyone choose their role
+
+
+
 
 
 # === DO NOT REMOVE THE FOLLOWING OR CHANGE PARAMETERS === #

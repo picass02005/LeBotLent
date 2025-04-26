@@ -20,5 +20,16 @@
         "group": [
             "bots_admin"
         ]
+    },
+    "list_class_role": {
+        "roles": [],
+        "users": [],
+        "permission_code": [
+            8
+        ],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
     }
 }
