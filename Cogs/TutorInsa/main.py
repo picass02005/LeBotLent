@@ -218,10 +218,6 @@ class TutorInsa(commands.GroupCog):
 
     # TODO: Send message to let anyone choose their role
 
-
-
-
-
 # === DO NOT REMOVE THE FOLLOWING OR CHANGE PARAMETERS === #
 
 async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
