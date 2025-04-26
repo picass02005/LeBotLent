@@ -25,5 +25,6 @@
         ],
         "delete_after": 3600
     },
+    "logs_delete_after": 86400,
     "disabled_cogs": []
 }
