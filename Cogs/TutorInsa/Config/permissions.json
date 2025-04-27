@@ -31,5 +31,16 @@
         "group": [
             "bots_admin"
         ]
+    },
+    "role_selector_manager": {
+        "roles": [],
+        "users": [],
+        "permission_code": [
+            8
+        ],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
     }
 }

@@ -8,6 +8,7 @@ import discord
 from discord import app_commands, Interaction
 from discord.ext import commands
 
+from Cogs.TutorInsa.RoleSelectorManager import RoleSelectorManager
 from Cogs.TutorInsa.Transformers.add_rm_class_role import AddClassRoleTransformer, RemoveClassRoleTransformer
 from Cogs.TutorInsa.Types.ClassEntry import ClassEntry
 from GlobalModules.GetConfig import get_config
@@ -32,6 +33,13 @@ class TutorInsa(commands.GroupCog):
             "ROLE_ID UNSIGNED INT,"
             "GUILD_ID UNSIGNED INT,"
             "CLASS TEXT);"
+        )
+
+        self.database.execute(
+            "CREATE TABLE IF NOT EXISTS TUTOR_ROLES_SELECTOR ("
+            "MESSAGE_ID UNSIGNED INT,"
+            "CHANNEL_ID UNSIGNED INT,"
+            "GUILD_ID UNSIGNED INT);"
         )
 
         self.database.commit()
@@ -215,6 +223,21 @@ class TutorInsa(commands.GroupCog):
             ephemeral=True,
             **kwargs
         )
+
+    @app_commands.command(name="role_selector_manager", description="Manage the role selector message of this guild")
+    @app_commands.default_permissions(administrator=True)
+    @has_perm()
+    async def role_selector_manager(self, inte: Interaction):
+        manager = RoleSelectorManager(self.database, inte.guild, inte.user)
+
+        if self.database.execute(
+                "SELECT COUNT(*) FROM TUTOR_ROLES_SELECTOR WHERE GUILD_ID=?;",
+                (inte.guild_id,)
+        ).fetchone()[0] >= 1:
+        # Modify / delete ! CONFIRM
+
+        else:
+    # Add ! CONFIRM
 
     # TODO: Send message to let anyone choose their role
 
