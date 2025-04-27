@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MIT
 # Copyright (C) 2025 picasso2005 <clementduran0@gmail.com> - All Rights Reserved
+
 import json
 import sqlite3
 from typing import Tuple, List, Dict
@@ -234,9 +235,11 @@ class TutorInsa(commands.GroupCog):
                 "SELECT COUNT(*) FROM TUTOR_ROLES_SELECTOR WHERE GUILD_ID=?;",
                 (inte.guild_id,)
         ).fetchone()[0] >= 1:
+            pass
         # Modify / delete ! CONFIRM
 
         else:
+            pass
     # Add ! CONFIRM
 
     # TODO: Send message to let anyone choose their role
