@@ -6,6 +6,8 @@ import sqlite3
 import discord
 from discord import Interaction
 
+from Cogs.TutorInsa.ConfirmSelect import ConfirmSelector
+
 
 class RoleSelectorManager:
     def __init__(self, db: sqlite3.Connection, guild: discord.Guild, author: discord.Member):
@@ -14,7 +16,17 @@ class RoleSelectorManager:
         self.author: discord.Member = author
 
     async def add(self, inte: Interaction):
-        pass
+        v = discord.ui.View()
+        v.add_item(ConfirmSelector(inte.user, self.add_callback))
+
+        await inte.response.send_message(
+            "Are you sure you want to add a role selector in this channel?",
+            view=None,  # TODO
+            ephemeral=True
+        )
+
+    async def add_callback(self, inte: Interaction) -> None:
+        print("TEST")
 
     async def modify_callback(self, inte: Interaction):
         if inte.user.id != self.author.id:

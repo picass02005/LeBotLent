@@ -2,21 +2,22 @@
 # Copyright (C) 2025 picasso2005 <clementduran0@gmail.com> - All Rights Reserved
 
 from collections.abc import Awaitable, Callable
-from typing import Any, Tuple
+from typing import Any, Tuple, Optional
 
 import discord
+from discord import Interaction
 
 
 class ConfirmSelector(discord.ui.Select):
     def __init__(
             self,
             author: discord.Member,
-            callback: Callable[[discord.Interaction, ...], Awaitable[...]],
-            *args: Tuple[Any, ...]
+            callback: Callable[[Interaction], Awaitable[Any]] | Callable[[Interaction, ...], Awaitable[Any]],
+            *args: Optional[Tuple[Any, ...]]
     ):
         self.author = author
-        self.callback: Callable[[discord.Interaction, ...], Awaitable[...]] = callback
-        self.args = args
+        self.callback: Callable[[Interaction], Awaitable[Any]] | Callable[[Interaction, ...], Awaitable[Any]] = callback
+        self.args = args if args else tuple()
 
         placeholder = "Please confirm your action"
 
