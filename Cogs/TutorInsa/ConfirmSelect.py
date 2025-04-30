@@ -16,7 +16,8 @@ class ConfirmSelector(discord.ui.Select):
             *args: Optional[Tuple[Any, ...]]
     ):
         self.author = author
-        self.callback: Callable[[Interaction], Awaitable[Any]] | Callable[[Interaction, ...], Awaitable[Any]] = callback
+        self.callback_func: Callable[[Interaction], Awaitable[Any]] | Callable[
+            [Interaction, ...], Awaitable[Any]] = callback
         self.args = args if args else tuple()
 
         placeholder = "Please confirm your action"
@@ -34,8 +35,14 @@ class ConfirmSelector(discord.ui.Select):
             await inte.response.send_message("Only the author can answer this", ephemeral=True)
             return
 
-        if int(inte.data['values'][0]) == "y":
-            await self.callback(inte, *self.args)
+        self.disabled = True
+        view = discord.ui.View()
+        view.add_item(self)
+
+        await inte.response.edit_message(view=view)
+
+        if inte.data['values'][0] == "y":
+            await self.callback_func(inte, *self.args)
 
         else:
-            await self.inte.send_message("Action cancelled", ephemeral=True)
+            await inte.followup.send("Action cancelled", ephemeral=True)

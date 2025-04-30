@@ -235,12 +235,12 @@ class TutorInsa(commands.GroupCog):
                 "SELECT COUNT(*) FROM TUTOR_ROLES_SELECTOR WHERE GUILD_ID=?;",
                 (inte.guild_id,)
         ).fetchone()[0] >= 1:
-            pass
-        # Modify / delete ! CONFIRM
+            print("TODO")  # TODO
+            # Modify / delete ! CONFIRM
 
         else:
-            pass
-    # Add ! CONFIRM
+            await manager.add(inte)
+            # TODO
 
     # TODO: Send message to let anyone choose their role
 

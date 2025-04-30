@@ -21,12 +21,13 @@ class RoleSelectorManager:
 
         await inte.response.send_message(
             "Are you sure you want to add a role selector in this channel?",
-            view=None,  # TODO
+            view=v,
             ephemeral=True
         )
 
     async def add_callback(self, inte: Interaction) -> None:
-        print("TEST")
+        await inte.followup.send("TODO ADD", ephemeral=True)
+        # TODO: add in db + send message
 
     async def modify_callback(self, inte: Interaction):
         if inte.user.id != self.author.id:
