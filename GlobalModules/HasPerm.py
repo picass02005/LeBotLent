@@ -130,12 +130,14 @@ def has_perm(db: sqlite3.Connection = None):
                             ephemeral=True
                         )
 
-            print(f"Garbage collector: {gc.collect()}")
+            if i := gc.collect():
+                print(f"Garbage collector: {i}")
             return ret
 
         return wrapper
 
-    print(f"Garbage collector HasPerm: {gc.collect()}")
+    if i := gc.collect():
+        print(f"Garbage collector HasPerm: {i}")
 
     return inner
 
