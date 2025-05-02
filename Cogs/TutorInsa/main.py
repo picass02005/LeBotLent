@@ -10,7 +10,7 @@ from discord import app_commands, Interaction
 from discord.ext import commands
 
 from Cogs.TutorInsa.RoleSelectorManager import RoleSelectorManager
-from Cogs.TutorInsa.Transformers.add_rm_class_role import AddClassRoleTransformer, RemoveClassRoleTransformer
+from Cogs.TutorInsa.Transformers.AddRmClassRole import AddClassRoleTransformer, RemoveClassRoleTransformer
 from Cogs.TutorInsa.Types.ClassEntry import ClassEntry
 from GlobalModules.GetConfig import get_config
 from GlobalModules.HasPerm import has_perm
