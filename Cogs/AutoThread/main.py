@@ -220,12 +220,12 @@ class AutoThread(commands.GroupCog):
             return
 
         if message.channel.id in self.__config:
-            if len(message.attachments) or "http" in message.content:
+            if len(message.attachments) or "http" in message.content or message.flags.forwarded:
                 await self.__make_thread(message)
 
             elif len(
                     self.database.execute(
-                        "SELECT 1 FROM AUTOTHREAD_REACT_WLIST WHERE GUILD_ID=? AND USER_ID=?",
+                        "SELECT 1 FROM AUTOTHREAD_REACT_WLIST WHERE GUILD_ID=? AND USER_ID=?;",
                         (message.guild.id, message.author.id)).fetchall()
             ):
                 await self.thread_react(message)
