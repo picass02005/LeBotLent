@@ -26,8 +26,13 @@ class RoleSelectorManager:
         )
 
     async def add_callback(self, inte: Interaction) -> None:
-        await inte.followup.send("TODO ADD", ephemeral=True)
-        # TODO: add in db + send message
+        msg = await self.send_message(inte.channel)
+
+        self.db.execute(
+            "INSERT INTO TUTOR_ROLES_SELECTOR (MESSAGE_ID,CHANNEL_ID,GUILD_ID) VALUES (?,?,?);",
+            (msg.id, inte.channel_id, inte.guild_id)
+        )
+        self.db.commit()
 
     async def modify_callback(self, inte: Interaction):
         if inte.user.id != self.author.id:
@@ -35,3 +40,10 @@ class RoleSelectorManager:
             return
 
         await inte.response.send_message("Modify", ephemeral=True)
+
+    @staticmethod
+    async def send_message(channel: discord.TextChannel) -> discord.Message:
+        return await channel.send("TODO SEND_MESSAGE")
+
+    async def selector_callback(self):
+        pass  # TODO
