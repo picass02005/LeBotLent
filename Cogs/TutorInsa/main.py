@@ -6,10 +6,10 @@ import sqlite3
 from typing import Tuple, List, Dict
 
 import discord
-from discord import app_commands, Interaction
+from discord import app_commands, Interaction, InteractionType
 from discord.ext import commands
 
-from Cogs.TutorInsa.RoleSelectorManager import RoleSelectorManager
+from Cogs.TutorInsa.RoleSelectorManager import RoleSelectorManager, SelectorCallbacks
 from Cogs.TutorInsa.Transformers.AddRmClassRole import AddClassRoleTransformer, RemoveClassRoleTransformer
 from Cogs.TutorInsa.Types.ClassEntry import ClassEntry
 from GlobalModules.GetConfig import get_config
@@ -243,6 +243,18 @@ class TutorInsa(commands.GroupCog):
             # TODO
 
     # TODO: Send message to let anyone choose their role
+    # TODO: Resend message if got deleted but not deleted in db (task)
+
+    @commands.Cog.listener()
+    async def on_interaction(self, inte: discord.Interaction):
+        if inte.type != InteractionType.component:
+            return
+
+        if "custom_id" not in inte.data.keys():
+            return
+
+        if inte.data["custom_id"].startswith("TUTORINSA.ROLESELECT."):
+            await SelectorCallbacks(self.database).selector_year_callback(inte)
 
 # === DO NOT REMOVE THE FOLLOWING OR CHANGE PARAMETERS === #
 
