@@ -235,15 +235,15 @@ class TutorInsa(commands.GroupCog):
                 "SELECT COUNT(*) FROM TUTOR_ROLES_SELECTOR WHERE GUILD_ID=?;",
                 (inte.guild_id,)
         ).fetchone()[0] >= 1:
+            await manager.delete_actual_message(inte.guild)
+            await inte.response.send_message("TODO MODIFY (just deleted previous mesage)", ephemeral=True)
             print("TODO")  # TODO
-            # Modify / delete ! CONFIRM
+            # Modify / delete / resend ! CONFIRM
 
         else:
             await manager.add(inte)
-            # TODO
 
-    # TODO: Send message to let anyone choose their role
-    # TODO: Resend message if got deleted but not deleted in db (task)
+    # TODO: Resend message if got deleted but not deleted in db (task) => Better with button on manager
 
     @commands.Cog.listener()
     async def on_interaction(self, inte: discord.Interaction):

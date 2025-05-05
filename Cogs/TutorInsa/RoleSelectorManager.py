@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MIT
 # Copyright (C) 2025 picasso2005 <clementduran0@gmail.com> - All Rights Reserved
+
 import json
 import sqlite3
 from typing import List, Dict, Tuple
@@ -74,6 +75,25 @@ class RoleSelectorManager:
         )
 
         return await channel.send(embed=e, view=view)
+
+    async def delete_actual_message(self, guild: discord.Guild):
+        tmp: Tuple[int, int] | None = self.db.execute(
+            "SELECT MESSAGE_ID, CHANNEL_ID FROM TUTOR_ROLES_SELECTOR WHERE GUILD_ID=?;",
+            (guild.id,)
+        ).fetchone()
+
+        actual_channel: discord.TextChannel = guild.get_channel(tmp[1])
+
+        if actual_channel is not None:
+            actual_msg: discord.PartialMessage = actual_channel.get_partial_message(tmp[0])
+            try:
+                await actual_msg.delete()
+
+            except (discord.NotFound, discord.Forbidden):
+                pass
+
+        self.db.execute("DELETE FROM TUTOR_ROLES_SELECTOR WHERE GUILD_ID=?;", (guild.id,))
+        self.db.commit()
 
 
 class SelectorCallbacks:
