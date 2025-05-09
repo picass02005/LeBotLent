@@ -52,7 +52,7 @@ class RoleSelectorManager:
             label="Delete",
             style=ButtonStyle.red
         )
-        b_delete.callback = self.delete_callback
+        b_delete.callback = self.delete_callback_confirmation
 
         b_cancel = discord.ui.Button(
             label="Cancel",
@@ -106,12 +106,23 @@ class RoleSelectorManager:
 
             Logger(self.db).add_log("TUTORINSA", f"Couldn't resend message: {type(err)}: {err}")
 
-    async def delete_callback(self, inte: Interaction):
+    async def delete_callback_confirmation(self, inte: Interaction):
         if inte.user.id != self.author.id:
             await inte.response.send_message("You do not have permission to interact here", ephemeral=True)
             return
 
-        await inte.response.send_message("Delete", ephemeral=True)
+        v = discord.ui.View()
+        v.add_item(ConfirmSelector(inte.user, self.delete_callback_confirmed))
+
+        await inte.response.send_message(
+            "Are you sure you want to **__delete__** the current role selector?",
+            view=v,
+            ephemeral=True
+        )
+
+    async def delete_callback_confirmed(self, inte: discord.Interaction):
+        await self.delete_actual_message(inte.guild)
+        await inte.followup.send("Role selector deleted", ephemeral=True)
 
     async def cancel_callback(self, inte: Interaction):
         if inte.user.id != self.author.id:
@@ -220,7 +231,7 @@ class SelectorCallbacks:
                 color=get_config("core.base_embed_color")
             )
 
-            await inte.response.send_message(embed=e, view=view, ephemeral=True)  # TODO
+            await inte.response.send_message(embed=e, view=view, ephemeral=True)
 
         else:
             e = discord.Embed(
