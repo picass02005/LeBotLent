@@ -240,8 +240,6 @@ class TutorInsa(commands.GroupCog):
         else:
             await manager.add(inte)
 
-    # TODO: Resend message if got deleted but not deleted in db (task) => Better with button on manager
-
     @commands.Cog.listener()
     async def on_interaction(self, inte: discord.Interaction):
         if inte.type != InteractionType.component:
@@ -265,7 +263,7 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
 
 # TODO: Voir document DM discord Tabatha (06/04) pour specification complètes
 
-# TODO: Choix role par année / PO / spécialité => Register role for each in db
+# DONE: Choix role par année / PO / spécialité => Register role for each in db
 
 # TODO: Demande de tutorat (button + view)
 # TODO: Quand un tutorat est demandé, message aux tuteurs avec possibilité de l'accepter (bouton) => Assigne dans une DB
