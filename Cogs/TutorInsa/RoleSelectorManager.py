@@ -6,11 +6,12 @@ import sqlite3
 from typing import List, Dict, Tuple
 
 import discord
-from discord import Interaction
+from discord import Interaction, ButtonStyle
 
 from Cogs.TutorInsa.ConfirmSelect import ConfirmSelector
 from Cogs.TutorInsa.Types.ClassEntry import ClassEntry
 from GlobalModules.GetConfig import get_config
+from GlobalModules.Logger import Logger
 
 
 class RoleSelectorManager:
@@ -40,12 +41,84 @@ class RoleSelectorManager:
 
         await inte.followup.send("Successfully added this role selector", ephemeral=True)
 
-    async def modify_callback(self, inte: Interaction):
+    async def resend_delete(self, inte: Interaction):
+        b_resend = discord.ui.Button(
+            label="Resend",
+            style=ButtonStyle.green
+        )
+        b_resend.callback = self.resend_callback
+
+        b_delete = discord.ui.Button(
+            label="Delete",
+            style=ButtonStyle.red
+        )
+        b_delete.callback = self.delete_callback
+
+        b_cancel = discord.ui.Button(
+            label="Cancel",
+            style=ButtonStyle.blurple
+        )
+        b_cancel.callback = self.cancel_callback
+
+        v = discord.ui.View()
+        v.add_item(b_resend)
+        v.add_item(b_delete)
+        v.add_item(b_cancel)
+
+        e = discord.Embed(
+            title="Manage current role message",
+            description="Select one action to perform",
+            color=get_config("core.base_embed_color")
+        )
+
+        await inte.response.send_message(embed=e, view=v, ephemeral=True)
+
+    async def resend_callback(self, inte: Interaction):
         if inte.user.id != self.author.id:
             await inte.response.send_message("You do not have permission to interact here", ephemeral=True)
             return
 
-        await inte.response.send_message("Modify", ephemeral=True)
+        try:
+            channel_id: int = self.db.execute(
+                "SELECT CHANNEL_ID FROM TUTOR_ROLES_SELECTOR WHERE GUILD_ID=?;",
+                (inte.guild_id,)
+            ).fetchone()[0]
+
+            channel: discord.TextChannel = await inte.guild.fetch_channel(channel_id)
+
+            await self.delete_actual_message(inte.guild)
+            msg = await self.send_message(channel)
+
+            self.db.execute(
+                "INSERT INTO TUTOR_ROLES_SELECTOR (MESSAGE_ID,CHANNEL_ID,GUILD_ID) VALUES (?,?,?);",
+                (msg.id, channel_id, inte.guild_id)
+            )
+            self.db.commit()
+
+            await inte.response.send_message("Message resent successfully", ephemeral=True)
+
+        except Exception as err:
+            await inte.response.send_message(
+                "Couldn't resend message\nTry to delete it first using this command then send it again\n"
+                "If this issue persists, please contact the developer",
+                ephemeral=True
+            )
+
+            Logger(self.db).add_log("TUTORINSA", f"Couldn't resend message: {type(err)}: {err}")
+
+    async def delete_callback(self, inte: Interaction):
+        if inte.user.id != self.author.id:
+            await inte.response.send_message("You do not have permission to interact here", ephemeral=True)
+            return
+
+        await inte.response.send_message("Delete", ephemeral=True)
+
+    async def cancel_callback(self, inte: Interaction):
+        if inte.user.id != self.author.id:
+            await inte.response.send_message("You do not have permission to interact here", ephemeral=True)
+            return
+
+        await inte.response.send_message("Cancelled", ephemeral=True)
 
     @staticmethod
     async def send_message(channel: discord.TextChannel) -> discord.Message:

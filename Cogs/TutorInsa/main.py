@@ -235,10 +235,7 @@ class TutorInsa(commands.GroupCog):
                 "SELECT COUNT(*) FROM TUTOR_ROLES_SELECTOR WHERE GUILD_ID=?;",
                 (inte.guild_id,)
         ).fetchone()[0] >= 1:
-            await manager.delete_actual_message(inte.guild)
-            await inte.response.send_message("TODO MODIFY (just deleted previous mesage)", ephemeral=True)
-            print("TODO")  # TODO
-            # Modify / delete / resend ! CONFIRM
+            await manager.resend_delete(inte)
 
         else:
             await manager.add(inte)
