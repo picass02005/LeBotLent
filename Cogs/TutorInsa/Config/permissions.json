@@ -42,5 +42,38 @@
         "group": [
             "bots_admin"
         ]
+    },
+    "add_tutor_request": {
+        "roles": [],
+        "users": [],
+        "permission_code": [
+            8
+        ],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "remove_tutor_request": {
+        "roles": [],
+        "users": [],
+        "permission_code": [
+            8
+        ],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
+    },
+    "resend_tutor_request": {
+        "roles": [],
+        "users": [],
+        "permission_code": [
+            8
+        ],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
     }
 }

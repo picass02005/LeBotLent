@@ -11,6 +11,7 @@ from discord.ext import commands
 
 from Cogs.TutorInsa.RoleSelectorManager import RoleSelectorManager, SelectorCallbacks
 from Cogs.TutorInsa.Transformers.AddRmClassRole import AddClassRoleTransformer, RemoveClassRoleTransformer
+from Cogs.TutorInsa.TutorRequestUtils import send_tutor_request_message, delete_tutor_request_message
 from Cogs.TutorInsa.Types.ClassEntry import ClassEntry
 from GlobalModules.GetConfig import get_config
 from GlobalModules.HasPerm import has_perm
@@ -40,6 +41,14 @@ class TutorInsa(commands.GroupCog):
             "CREATE TABLE IF NOT EXISTS TUTOR_ROLES_SELECTOR ("
             "MESSAGE_ID UNSIGNED INT,"
             "CHANNEL_ID UNSIGNED INT,"
+            "GUILD_ID UNSIGNED INT);"
+        )
+
+        self.database.execute(
+            "CREATE TABLE IF NOT EXISTS TUTOR_REQUEST ("
+            "REQ_MSG_ID UNSIGNED INT,"
+            "REQ_CHANNEL_ID UNSIGNED INT,"
+            "SEND_CHANNEL_ID UNSIGNED INT,"
             "GUILD_ID UNSIGNED INT);"
         )
 
@@ -240,6 +249,100 @@ class TutorInsa(commands.GroupCog):
         else:
             await manager.add(inte)
 
+    @app_commands.command(name="add_tutor_request", description="Add the tutor request message")
+    @app_commands.default_permissions(administrator=True)
+    @has_perm()
+    async def add_tutor_request(
+            self,
+            inte: Interaction,
+            message_channel: discord.TextChannel,
+            tutor_channel: discord.TextChannel
+    ):
+        if self.database.execute(
+                "SELECT COUNT(*) FROM TUTOR_REQUEST WHERE GUILD_ID=?;",
+                (inte.guild_id,)
+        ).fetchone()[0] >= 1:
+            await inte.response.send_message(
+                "A tutor request message is already set\nIn order to modify it, please remove it before",
+                ephemeral=True
+            )
+            return
+
+        msg = await send_tutor_request_message(self.database, message_channel)
+
+        self.database.execute(
+            "INSERT INTO TUTOR_REQUEST (REQ_MSG_ID,REQ_CHANNEL_ID,SEND_CHANNEL_ID,GUILD_ID) VALUES (?,?,?,?);",
+            (msg.id, message_channel.id, tutor_channel.id, inte.guild_id)
+        )
+        self.database.commit()
+
+        await inte.response.send_message(
+            f"Successfully added a tutoring message in {message_channel.mention} which redirect requests into "
+            f"{tutor_channel.mention}",
+            ephemeral=True
+        )
+
+    @app_commands.command(name="remove_tutor_request", description="Add the tutor request message")
+    @app_commands.default_permissions(administrator=True)
+    @has_perm()
+    async def remove_tutor_request(self, inte: Interaction):
+        if self.database.execute(
+                "SELECT COUNT(*) FROM TUTOR_REQUEST WHERE GUILD_ID=?;",
+                (inte.guild_id,)
+        ).fetchone()[0] == 0:
+            await inte.response.send_message(
+                "There is no tutor request messages on this guild",
+                ephemeral=True
+            )
+            return
+
+        await delete_tutor_request_message(self.database, inte.guild)
+
+        self.database.execute(
+            "DELETE FROM TUTOR_REQUEST WHERE GUILD_ID=?;",
+            (inte.guild_id,)
+        )
+        self.database.commit()
+
+        await inte.response.send_message(
+            f"Successfully deleted this guild tutor request message",
+            ephemeral=True
+        )
+
+    @app_commands.command(name="resend_tutor_request", description="Add the tutor request message")
+    @app_commands.default_permissions(administrator=True)
+    @has_perm()
+    async def resend_tutor_request(self, inte: Interaction):
+        if self.database.execute(
+                "SELECT COUNT(*) FROM TUTOR_REQUEST WHERE GUILD_ID=?;",
+                (inte.guild_id,)
+        ).fetchone()[0] == 0:
+            await inte.response.send_message(
+                "There is no tutor request messages on this guild",
+                ephemeral=True
+            )
+            return
+
+        await delete_tutor_request_message(self.database, inte.guild)
+
+        channel_id = self.database.execute(
+            "SELECT REQ_CHANNEL_ID FROM TUTOR_REQUEST WHERE GUILD_ID=?;",
+            (inte.guild_id,)
+        ).fetchone()[0]
+
+        msg = await send_tutor_request_message(self.database, inte.guild.get_channel(channel_id))
+
+        self.database.execute(
+            "UPDATE TUTOR_REQUEST SET REQ_MSG_ID=? WHERE GUILD_ID=?;",
+            (msg.id, inte.guild_id)
+        )
+        self.database.commit()
+
+        await inte.response.send_message(
+            f"Successfully resent this guild tutor request message",
+            ephemeral=True
+        )
+
     @commands.Cog.listener()
     async def on_interaction(self, inte: discord.Interaction):
         if inte.type != InteractionType.component:
@@ -266,7 +369,7 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
 # DONE: Choix role par année / PO / spécialité => Register role for each in db
 
 # TODO: Demande de tutorat (button + view)
-# TODO: Quand un tutorat est demandé, message aux tuteurs avec possibilité de l'accepter (bouton) (=> Assigne dans une DB)
+# TODO: Quand un tutorat est demandé, message aux tuteurs (avec possibilité de l'accepter (bouton) => Assigne dans une DB)
 
 # (TODO: Moyen pour les tuteurs de marquer un tutorat qui leur a été assigné comme fait + donner le temps consacré + commentaires + autre séance?)
 # (TODO: Demande d'avis anonyme automatisée après les tutorat (view))
