@@ -50,6 +50,15 @@ if os.name == 'nt' and not TEST_VERSION:
 async def on_ready():
     logger.add_log("Core", f"Bot connected: {bot.user} (ID: {bot.user.id})")
 
+    logger.add_log("Core", f"Syncing global command tree")
+    await bot.tree.sync()
+
+    logger.add_log("Core", f"Syncing per-guild command tree")
+    for i in bot.guilds:
+        await bot.tree.sync(guild=i)
+
+    logger.add_log("Core", f"Every command tree synced")
+
 
 @bot.event
 async def setup_hook() -> None:
@@ -60,8 +69,6 @@ async def setup_hook() -> None:
     for key, value in cogManager.list_cog().items():
         if not value and key not in disabled_by_config:
             await cogManager.load_cog(key)
-
-    await bot.tree.sync()
 
     remove_old_paginator.start()
     clear_temp_files.start()
