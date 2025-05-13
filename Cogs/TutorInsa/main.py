@@ -11,7 +11,8 @@ from discord.ext import commands
 
 from Cogs.TutorInsa.RoleSelectorManager import RoleSelectorManager, SelectorCallbacks
 from Cogs.TutorInsa.Transformers.AddRmClassRole import AddClassRoleTransformer, RemoveClassRoleTransformer
-from Cogs.TutorInsa.TutorRequestUtils import send_tutor_request_message, delete_tutor_request_message
+from Cogs.TutorInsa.TutorRequestUtils import send_tutor_request_message, delete_tutor_request_message, \
+    tutor_request_callback
 from Cogs.TutorInsa.Types.ClassEntry import ClassEntry
 from GlobalModules.GetConfig import get_config
 from GlobalModules.HasPerm import has_perm
@@ -268,7 +269,7 @@ class TutorInsa(commands.GroupCog):
             )
             return
 
-        msg = await send_tutor_request_message(self.database, message_channel)
+        msg = await send_tutor_request_message(message_channel)
 
         self.database.execute(
             "INSERT INTO TUTOR_REQUEST (REQ_MSG_ID,REQ_CHANNEL_ID,SEND_CHANNEL_ID,GUILD_ID) VALUES (?,?,?,?);",
@@ -330,7 +331,7 @@ class TutorInsa(commands.GroupCog):
             (inte.guild_id,)
         ).fetchone()[0]
 
-        msg = await send_tutor_request_message(self.database, inte.guild.get_channel(channel_id))
+        msg = await send_tutor_request_message(inte.guild.get_channel(channel_id))
 
         self.database.execute(
             "UPDATE TUTOR_REQUEST SET REQ_MSG_ID=? WHERE GUILD_ID=?;",
@@ -351,8 +352,13 @@ class TutorInsa(commands.GroupCog):
         if "custom_id" not in inte.data.keys():
             return
 
-        if inte.data["custom_id"].startswith("TUTORINSA.ROLESELECT."):
-            await SelectorCallbacks(self.database).selector_year_callback(inte)
+        match inte.data["custom_id"]:
+            case s if s.startswith("TUTORINSA.ROLESELECT."):
+                await SelectorCallbacks(self.database).selector_year_callback(inte)
+
+            case s if s.startswith("TUTORINSA.TUTOR_REQUEST."):
+                await tutor_request_callback(self.database, inte)
+
 
 # === DO NOT REMOVE THE FOLLOWING OR CHANGE PARAMETERS === #
 
