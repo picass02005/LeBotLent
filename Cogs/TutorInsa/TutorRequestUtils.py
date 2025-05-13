@@ -52,14 +52,15 @@ async def delete_tutor_request_message(db: sqlite3.Connection, guild: discord.Gu
 
 
 async def tutor_request_callback(db: sqlite3.Connection, inte: discord.Interaction):
-    roles_id = [i[0] for i in db.execute(
-        "SELECT ROLE_ID FROM TUTOR_ROLES WHERE GUILD_ID=?;",
+    classes = db.execute(
+        "SELECT ROLE_ID,CLASS FROM TUTOR_ROLES WHERE GUILD_ID=?;",
         (inte.guild_id,)
-    ).fetchall()]
+    ).fetchall()
 
-    common_roles = list(filter(lambda x: x.id in roles_id, inte.user.roles))
+    roles_id = [i.id for i in inte.user.roles]
+    common_classes = [i for i in classes if i[0] in roles_id]
 
-    if len(common_roles) != 1:
+    if len(common_classes) != 1:
         c = db.execute(
             "SELECT MESSAGE_ID,CHANNEL_ID FROM TUTOR_ROLES_SELECTOR WHERE GUILD_ID=?;",
             (inte.guild_id,)
@@ -74,7 +75,7 @@ async def tutor_request_callback(db: sqlite3.Connection, inte: discord.Interacti
             return
 
         msg = inte.guild.get_channel(c[1]).get_partial_message(c[0])
-        if len(common_roles) == 0:
+        if len(common_classes) == 0:
             await inte.response.send_message(
                 f"Pour pouvoir demander un tutorat, merci de sélectionner votre classe dans {msg.jump_url}\n\n"
                 f"In order to ask for a tutoring session, please select your class in {msg.jump_url}",
@@ -92,6 +93,42 @@ async def tutor_request_callback(db: sqlite3.Connection, inte: discord.Interacti
             )
             return
 
-    await inte.response.send_message("TODO MODAL", ephemeral=True)
+    await inte.response.send_modal(RequestTutoringModal(db, common_classes[0][1]))
 
-# TODO: Listener on button + modal for requesting tutoring session
+
+class RequestTutoringModal(discord.ui.Modal):
+    subject = discord.ui.TextInput(
+        label="Matière / Academic subject",
+        style=discord.TextStyle.short,
+        placeholder="Mathématiques / mathematics",
+        required=True,
+        max_length=100
+    )
+
+    concepts = discord.ui.TextInput(
+        label="Notions à revoir / Concepts to review",
+        style=discord.TextStyle.paragraph,
+        placeholder="Leçon sur la dérivabilité\n\n"
+                    "Lesson about derivatives",
+        required=True,
+        max_length=4000
+    )
+
+    contact = discord.ui.TextInput(
+        label="Votre contact / Your contact",
+        style=discord.TextStyle.paragraph,
+        placeholder="Email: example@insa-toulouse.fr\nInstagram: @example\nMessenger: example\n...",
+        required=True,
+        max_length=4000
+    )
+
+    def __init__(self, database: sqlite3.Connection, class_id: str):
+        super().__init__(title="Demande de tutorat / Request tutoring session")
+        self.db = database
+        self.class_id = class_id
+
+    async def on_submit(self, inte: discord.Interaction, /) -> None:
+        print(f"{self.subject.value=}\n{self.concepts.value=}\n{self.contact.value=}")
+        await inte.response.send_message("TODO CALLBACK", ephemeral=True)
+
+        # TODO
