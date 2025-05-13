@@ -21,13 +21,15 @@ async def send_tutor_request_message(db: sqlite3.Connection, channel: discord.Te
     e = discord.Embed(
         title="Demander une séance de tutorat / Request a tutoring session",
         description="### Afin de demander une séance de tutorat, veuillez suivre cette démarche:\n"
-                    "1. Appuyez sur le bouton ci-dessous, une fenêtre s'ouvrira\n"
-                    "2. Remplissez les informations demandées\n"
-                    "3. Cliquez sur \"Envoyer\"\n\n"
-                    "### In order to request a tutoring session, please follow the following:\n"
-                    "1. Click on the button below, a window will be opened\n"
-                    "2. Fill every fields accordingly\n"
-                    "3. Click on \"Submit\"",
+                    "1. Sélectionnez votre rôle de classe (si pas encore fait)\n"
+                    "2. Appuyez sur le bouton ci-dessous, une fenêtre s'ouvrira\n"
+                    "3. Remplissez les informations demandées\n"
+                    "4. Cliquez sur \"Envoyer\"\n\n"
+                    "### In order to request a tutoring session, please follow thoses steps:\n"
+                    "1. Select your class role (if not already done)\n"
+                    "2. Click on the button below, a window will be opened\n"
+                    "3. Fill every fields accordingly\n"
+                    "4. Click on \"Submit\"",
         color=get_config("core.base_embed_color")
     )
 
