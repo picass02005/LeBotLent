@@ -200,9 +200,12 @@ class SelectorCallbacks:
                 if c.year == year:
                     from_json.update({k: c})
 
+        args = list(from_json.keys())
+        args.append(inte.guild_id)
+
         from_db: List[Tuple[str]] = self.db.execute(
-            f"SELECT CLASS FROM TUTOR_ROLES WHERE CLASS IN ({','.join(['?'] * len(from_json))});",
-            list(from_json.keys())
+            f"SELECT CLASS FROM TUTOR_ROLES WHERE CLASS IN ({','.join(['?'] * len(from_json))}) AND GUILD_ID=?;",
+            tuple(args)
         ).fetchall()
 
         options = []
