@@ -1,10 +1,13 @@
 # SPDX-License-Identifier: MIT
 # Copyright (C) 2025 picasso2005 <clementduran0@gmail.com> - All Rights Reserved
 
+import json
 import sqlite3
+from typing import List, Tuple
 
 import discord
 
+from Cogs.TutorInsa.Types.ClassEntry import ClassEntry
 from GlobalModules.GetConfig import get_config
 from GlobalModules.Logger import Logger
 
@@ -111,7 +114,7 @@ class RequestTutoringModal(discord.ui.Modal):
         placeholder="Leçon sur la dérivabilité\n\n"
                     "Lesson about derivatives",
         required=True,
-        max_length=4000
+        max_length=1024
     )
 
     contact = discord.ui.TextInput(
@@ -119,7 +122,7 @@ class RequestTutoringModal(discord.ui.Modal):
         style=discord.TextStyle.paragraph,
         placeholder="Email: example@insa-toulouse.fr\nInstagram: @example\nMessenger: example\n...",
         required=True,
-        max_length=4000
+        max_length=1024
     )
 
     def __init__(self, database: sqlite3.Connection, class_id: str):
@@ -128,7 +131,109 @@ class RequestTutoringModal(discord.ui.Modal):
         self.class_id = class_id
 
     async def on_submit(self, inte: discord.Interaction, /) -> None:
-        print(f"{self.subject.value=}\n{self.concepts.value=}\n{self.contact.value=}")
-        await inte.response.send_message("TODO CALLBACK", ephemeral=True)
+        tutor_channel_id: None | Tuple[int] = self.db.execute(
+            "SELECT SEND_CHANNEL_ID FROM TUTOR_REQUEST WHERE GUILD_ID=?;",
+            (inte.guild_id,)
+        ).fetchone()
 
-        # TODO
+        err: None | str = None
+
+        if tutor_channel_id is None:
+            err = "Unable to find tutor channel in db"
+
+        else:
+            tutor_channel = await inte.guild.fetch_channel(tutor_channel_id[0])
+
+            if tutor_channel is None:
+                err = f"Couldn't get channel object (ID: {tutor_channel_id})"
+
+            else:
+                try:
+                    await self.send_tutor_message(tutor_channel, inte.user)
+
+                except Exception as e:
+                    err = f"An error happened while sending message: [{type(e)}] {e}"
+
+        if err is not None:
+            Logger(self.db).add_log(
+                "TUTORINSA",
+                f"Couldn't forward tutoring session request: {err}"
+            )
+
+            e = discord.Embed(
+                title="ERREUR / ERROR",
+                description="Une erreur est survenue, votre demande de tutorat n'a pas aboutie.\n"
+                            "### Merci de contacter un administrateur du serveur.\n\n"
+                            "An error happened, your tutoring session request did not succeed.\n"
+                            "### Please contact a guild administrator.",
+                color=0xFF0000
+            )
+
+            await inte.response.send_message(embed=e, ephemeral=True)
+
+        else:
+            e = discord.Embed(
+                title="Succès / Success",
+                description="Votre demande de tutorat à été transmise.\n"
+                            "### Un tuteur vous recontactera dans les plus brefs délais.\n\n"
+                            "Your tutoring session has been forwarded.\n"
+                            "### A tutor will contact you as soon as possible.",
+                color=0x00FF00
+            )
+
+            await inte.response.send_message(embed=e, ephemeral=True)
+
+    async def send_tutor_message(self, channel: discord.TextChannel, author: discord.User):
+        with open("Cogs/TutorInsa/Config/classes.json", "r") as f:
+            class_entry = ClassEntry(json.loads(f.read())[self.class_id])
+
+        mentions = self.mentions(class_entry, channel.guild)
+
+        e = discord.Embed(
+            title="Nouvelle demande de tutorat",
+            description="Les informations nécessaires sont disponibles ci-dessous",
+            color=get_config("core.base_embed_color")
+        )
+
+        e.add_field(
+            name="Identité",
+            value=f"Auteur: {author.mention}\n"
+                  f"Année: `{class_entry.year}A`\n"
+                  f"Classe: `{class_entry.name}`",
+            inline=True
+        )
+
+        e.add_field(
+            name="Matière",
+            value=self.subject.value,
+            inline=True
+        )
+
+        e.add_field(
+            name="Notions demandées",
+            value=self.concepts.value,
+            inline=False
+        )
+
+        e.add_field(
+            name="Contact",
+            value=self.contact.value,
+            inline=False
+        )
+
+        await channel.send(content=f"Mentions: {mentions}", embed=e)
+
+    def mentions(self, class_entry: ClassEntry, guild: discord.Guild) -> str:
+        args: List[str | int] = class_entry.next
+        args.append(guild.id)
+
+        from_db: List[Tuple[int]] = self.db.execute(
+            f"SELECT ROLE_ID FROM TUTOR_ROLES WHERE CLASS IN ({','.join(['?'] * (len(class_entry.next) - 1))}) AND "
+            f"GUILD_ID=?;",
+            tuple(args)
+        ).fetchall()
+
+        if len(from_db) == 0 or len(class_entry.next) == 0:
+            return "`Aucun role à mentionner trouvés`"
+
+        return " ".join([f"<@&{i[0]}>" for i in from_db])
