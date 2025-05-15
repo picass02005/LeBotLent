@@ -132,7 +132,7 @@ class RequestTutoringModal(discord.ui.Modal):
 
     async def on_submit(self, inte: discord.Interaction, /) -> None:
         tutor_channel_id: None | Tuple[int] = self.db.execute(
-            "SELECT SEND_CHANNEL_ID FROM TUTOR_REQUEST WHERE GUILD_ID=?;",
+            "SELECT TUTOR_REQ_CHANNEL_ID FROM TUTOR_REQUEST WHERE GUILD_ID=?;",
             (inte.guild_id,)
         ).fetchone()
 
@@ -174,10 +174,10 @@ class RequestTutoringModal(discord.ui.Modal):
         else:
             e = discord.Embed(
                 title="Succès / Success",
-                description="Votre demande de tutorat à été transmise.\n"
-                            "### Un tuteur vous recontactera dans les plus brefs délais.\n\n"
-                            "Your tutoring session has been forwarded.\n"
-                            "### A tutor will contact you as soon as possible.",
+                description="### Votre demande de tutorat à été transmise.\n"
+                            "Un tuteur vous recontactera dans les plus brefs délais.\n\n"
+                            "### Your tutoring session has been forwarded.\n"
+                            "A tutor will contact you as soon as possible.",
                 color=0x00FF00
             )
 

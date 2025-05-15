@@ -49,7 +49,8 @@ class TutorInsa(commands.GroupCog):
             "CREATE TABLE IF NOT EXISTS TUTOR_REQUEST ("
             "REQ_MSG_ID UNSIGNED INT,"
             "REQ_CHANNEL_ID UNSIGNED INT,"
-            "SEND_CHANNEL_ID UNSIGNED INT,"
+            "TUTOR_REQ_CHANNEL_ID UNSIGNED INT,"
+            "TUTOR_ACCEPT_CHANNEL_ID UNSIGNED INT,"
             "GUILD_ID UNSIGNED INT);"
         )
 
@@ -257,7 +258,8 @@ class TutorInsa(commands.GroupCog):
             self,
             inte: Interaction,
             message_channel: discord.TextChannel,
-            tutor_channel: discord.TextChannel
+            tutor_request_channel: discord.TextChannel,
+            tutor_accepted_channel: discord.TextChannel
     ):
         if self.database.execute(
                 "SELECT COUNT(*) FROM TUTOR_REQUEST WHERE GUILD_ID=?;",
@@ -272,14 +274,15 @@ class TutorInsa(commands.GroupCog):
         msg = await send_tutor_request_message(message_channel)
 
         self.database.execute(
-            "INSERT INTO TUTOR_REQUEST (REQ_MSG_ID,REQ_CHANNEL_ID,SEND_CHANNEL_ID,GUILD_ID) VALUES (?,?,?,?);",
-            (msg.id, message_channel.id, tutor_channel.id, inte.guild_id)
+            "INSERT INTO TUTOR_REQUEST (REQ_MSG_ID,REQ_CHANNEL_ID,TUTOR_REQ_CHANNEL_ID,TUTOR_ACCEPT_CHANNEL_ID,"
+            "GUILD_ID) VALUES (?,?,?,?,?);",
+            (msg.id, message_channel.id, tutor_request_channel.id, tutor_accepted_channel.id, inte.guild_id)
         )
         self.database.commit()
 
         await inte.response.send_message(
             f"Successfully added a tutoring message in {message_channel.mention} which redirect requests into "
-            f"{tutor_channel.mention}",
+            f"{tutor_request_channel.mention}",
             ephemeral=True
         )
 
