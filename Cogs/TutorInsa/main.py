@@ -381,7 +381,7 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
 # DONE: Choix role par année / PO / spécialité => Register role for each in db
 
 # DONE: Demande de tutorat (button + view)
-# TODO: Quand un tutorat est demandé, message aux tuteurs (avec possibilité de l'accepter (bouton) => Assigne dans une DB)
+# DONE: Quand un tutorat est demandé, message aux tuteurs (avec possibilité de l'accepter (bouton))
 
 # (TODO: Moyen pour les tuteurs de marquer un tutorat qui leur a été assigné comme fait + donner le temps consacré + commentaires + autre séance?)
 # (TODO: Demande d'avis anonyme automatisée après les tutorat (view))
