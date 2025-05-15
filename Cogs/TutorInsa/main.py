@@ -12,7 +12,7 @@ from discord.ext import commands
 from Cogs.TutorInsa.RoleSelectorManager import RoleSelectorManager, SelectorCallbacks
 from Cogs.TutorInsa.Transformers.AddRmClassRole import AddClassRoleTransformer, RemoveClassRoleTransformer
 from Cogs.TutorInsa.TutorRequestUtils import send_tutor_request_message, delete_tutor_request_message, \
-    tutor_request_callback
+    tutor_request_callback, TutorAcceptCallback
 from Cogs.TutorInsa.Types.ClassEntry import ClassEntry
 from GlobalModules.GetConfig import get_config
 from GlobalModules.HasPerm import has_perm
@@ -359,8 +359,11 @@ class TutorInsa(commands.GroupCog):
             case s if s.startswith("TUTORINSA.ROLESELECT."):
                 await SelectorCallbacks(self.database).selector_year_callback(inte)
 
-            case s if s.startswith("TUTORINSA.TUTOR_REQUEST."):
+            case s if s.startswith("TUTORINSA.TUTOR_REQUEST_MODAL."):
                 await tutor_request_callback(self.database, inte)
+
+            case s if s.startswith("TUTORINSA.TUTOR_REQUEST_ACCEPT."):
+                await TutorAcceptCallback(self.database).tutor_accept_callback(inte)
 
 
 # === DO NOT REMOVE THE FOLLOWING OR CHANGE PARAMETERS === #

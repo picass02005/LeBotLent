@@ -3,10 +3,12 @@
 
 import json
 import sqlite3
+import time
 from typing import List, Tuple
 
 import discord
 
+from Cogs.TutorInsa.ConfirmSelect import ConfirmSelector
 from Cogs.TutorInsa.Types.ClassEntry import ClassEntry
 from GlobalModules.GetConfig import get_config
 from GlobalModules.Logger import Logger
@@ -16,7 +18,7 @@ async def send_tutor_request_message(channel: discord.TextChannel) -> discord.Me
     b = discord.ui.Button(
         style=discord.ButtonStyle.green,
         label="Demander un tutorat",
-        custom_id=f"TUTORINSA.TUTOR_REQUEST.{channel.id}"
+        custom_id=f"TUTORINSA.TUTOR_REQUEST_MODAL.{channel.id}"
     )
     v = discord.ui.View()
     v.add_item(b)
@@ -221,7 +223,15 @@ class RequestTutoringModal(discord.ui.Modal):
             inline=False
         )
 
-        await channel.send(content=f"Mentions: {mentions}", embed=e)
+        button = discord.ui.Button(
+            label="Accepter le tutorat",
+            style=discord.ButtonStyle.green,
+            custom_id=f"TUTORINSA.TUTOR_REQUEST_ACCEPT.{hash(f"{author.id}.{time.time()}")}"
+        )
+        view = discord.ui.View()
+        view.add_item(button)
+
+        await channel.send(content=f"Mentions: {mentions}", embed=e, view=view)
 
     def mentions(self, class_entry: ClassEntry, guild: discord.Guild) -> str:
         args: List[str | int] = class_entry.next
@@ -237,3 +247,72 @@ class RequestTutoringModal(discord.ui.Modal):
             return "`Aucun role à mentionner trouvés`"
 
         return " ".join([f"<@&{i[0]}>" for i in from_db])
+
+
+class TutorAcceptCallback:
+    def __init__(self, db: sqlite3.Connection):
+        self.db = db
+        self.original_message: None | discord.Message = None
+
+    async def tutor_accept_callback(self, inte: discord.Interaction):
+        v = discord.ui.View()
+        v.add_item(ConfirmSelector(inte.user, self.tutor_forward_message))
+
+        self.original_message = inte.message
+
+        await inte.response.send_message("Voulez-vous accepter ce tutorat?", view=v, ephemeral=True)
+
+    async def tutor_forward_message(self, inte: discord.Interaction):
+        accept_chanel_id = self.db.execute(
+            "SELECT TUTOR_ACCEPT_CHANNEL_ID FROM TUTOR_REQUEST WHERE GUILD_ID=?;",
+            (inte.guild_id,)
+        ).fetchone()
+
+        err: None | str = None
+        accept_channel: None | discord.TextChannel = None
+
+        if accept_chanel_id is None:
+            err = "Couldn't fetch TUTOR_ACCEPT_CHANNEL_ID from DB"
+
+        else:
+            try:
+                accept_channel = await inte.guild.fetch_channel(accept_chanel_id[0])
+
+            except Exception as e:
+                err = f"Couldn't fetch channel with ID {accept_chanel_id[0]}: {type(e)} {e}"
+
+        if err is not None:
+            Logger(self.db).add_log(
+                "TUTORINSA",
+                f"An error occured while accepting a tutor request: {err}"
+            )
+
+            await inte.followup.send(
+                "Une erreur s'est produite. Merci de contacter les administrateurs du serveur.",
+                ephemeral=True
+            )
+            return
+
+        e = self.original_message.embeds[0]
+        e.title = "Tutorat pris en charge"
+
+        await accept_channel.send(
+            content=f"# Tutorat pris en charge par {inte.user.mention}",
+            embed=e
+        )
+
+        try:
+            await self.original_message.delete()
+            await inte.followup.send("Tutorat accepté avec succès", ephemeral=True)
+
+        except Exception:
+            await inte.followup.send(
+                "Tutorat accepté avec une erreur lors de la suppression de sa demande.\n"
+                "Un message à été envoyé pour prévenir les autres tuteurs.",
+                ephemeral=True
+            )
+
+            await inte.followup.send(
+                f"Une erreur s'est produite lors de la suppression de la demande de tutorat suivante: "
+                f"{self.original_message.jump_url}"
+            )
