@@ -347,6 +347,16 @@ class TutorInsa(commands.GroupCog):
             ephemeral=True
         )
 
+    @app_commands.command(name="manual", description="Send the module manual")
+    @app_commands.default_permissions(administrator=True)
+    @has_perm()
+    async def manual(self, inte: Interaction):
+        file = discord.File(
+            "Cogs/TutorInsa/Documentation/Doc_LeBotLent_TutorINSA.pdf",
+            filename="Doc_LeBotLent_TutorINSA.pdf"
+        )
+        await inte.response.send_message("Module TutorINSA manual:", file=file, ephemeral=True)
+
     @commands.Cog.listener()
     async def on_interaction(self, inte: discord.Interaction):
         if inte.type != InteractionType.component:

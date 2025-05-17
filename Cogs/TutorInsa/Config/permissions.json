@@ -75,5 +75,16 @@
         "group": [
             "bots_admin"
         ]
+    },
+    "manual": {
+        "roles": [],
+        "users": [],
+        "permission_code": [
+            8
+        ],
+        "guilds": [],
+        "group": [
+            "bots_admin"
+        ]
     }
 }
