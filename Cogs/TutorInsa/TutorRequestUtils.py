@@ -17,7 +17,7 @@ from GlobalModules.Logger import Logger
 async def send_tutor_request_message(channel: discord.TextChannel) -> discord.Message:
     b = discord.ui.Button(
         style=discord.ButtonStyle.green,
-        label="Demander un tutorat",
+        label="Demander un tutorat / Request a tutoring session",
         custom_id=f"TUTORINSA.TUTOR_REQUEST_MODAL.{channel.id}"
     )
     v = discord.ui.View()
