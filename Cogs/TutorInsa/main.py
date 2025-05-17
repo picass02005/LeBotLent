@@ -393,5 +393,6 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
 # TODO: check config
 
 # TODO: documentation pour passassion (p-e une commande pour la récupérer dispo aux respos + version pour les tuteurs)
+# TODO: /manual
 
 # TODO: perms + brief
