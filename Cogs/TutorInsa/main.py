@@ -251,7 +251,7 @@ class TutorInsa(commands.GroupCog):
         else:
             await manager.add(inte)
 
-    @app_commands.command(name="add_tutor_request", description="Add the tutor request message")
+    @app_commands.command(name="add_tutor_request", description="Add the tutor request message for this guild")
     @app_commands.default_permissions(administrator=True)
     @has_perm()
     async def add_tutor_request(
@@ -286,7 +286,7 @@ class TutorInsa(commands.GroupCog):
             ephemeral=True
         )
 
-    @app_commands.command(name="remove_tutor_request", description="Add the tutor request message")
+    @app_commands.command(name="remove_tutor_request", description="Remove the tutor request message of this guild")
     @app_commands.default_permissions(administrator=True)
     @has_perm()
     async def remove_tutor_request(self, inte: Interaction):
@@ -313,7 +313,7 @@ class TutorInsa(commands.GroupCog):
             ephemeral=True
         )
 
-    @app_commands.command(name="resend_tutor_request", description="Add the tutor request message")
+    @app_commands.command(name="resend_tutor_request", description="Resend the tutor request message of this guild")
     @app_commands.default_permissions(administrator=True)
     @has_perm()
     async def resend_tutor_request(self, inte: Interaction):
@@ -399,10 +399,10 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
 # (TODO: Commande pour avoir un histoirque des tutorats demandés par une personne (+ le nombre))
 # (TODO: La même chose pour les tuteurs pour voir quels tutorats ils ont fait / le temps)
 
-# TODO: limit all actions to only tutorinsa discord => Already done for commands
-# TODO: check config
+# DONE: limit all actions to only tutorinsa discord => Already done for commands
+# DONE: check config
 
-# TODO: documentation pour passassion (p-e une commande pour la récupérer dispo aux respos + version pour les tuteurs)
-# TODO: /manual
+# DONE: documentation pour passassion (p-e une commande pour la récupérer dispo aux respos + version pour les tuteurs)
+# DONE: /manual
 
-# TODO: perms + brief
+# DONE: perms + brief
