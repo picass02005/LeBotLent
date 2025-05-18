@@ -386,23 +386,26 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
     guilds = [discord.Object(id=i, type=discord.Guild) for i in get_config("TutorInsa.guilds")]
     await bot.add_cog(TutorInsa(bot, database), guilds=guilds)
 
-# TODO: Voir document DM discord Tabatha (06/04) pour specification complètes
+# ===== NON NECESSARY FONCTIONALITIES ===== #
 
-# DONE: Choix role par année / PO / spécialité => Register role for each in db
+# Moyen pour les tuteurs de marquer un tutorat qui leur a été assigné comme fait + donner le temps consacré + commentaires + autre séance?)
+# Demande d'avis anonyme automatisée après les tutorat (view))
 
-# DONE: Demande de tutorat (button + view)
-# DONE: Quand un tutorat est demandé, message aux tuteurs (avec possibilité de l'accepter (bouton))
+# Commande pour avoir un histoirque des tutorats demandés par une personne (+ le nombre))
+# La même chose pour les tuteurs pour voir quels tutorats ils ont fait / le temps)
 
-# (TODO: Moyen pour les tuteurs de marquer un tutorat qui leur a été assigné comme fait + donner le temps consacré + commentaires + autre séance?)
-# (TODO: Demande d'avis anonyme automatisée après les tutorat (view))
+# ===== FUNCTIONALITIES DONE ===== #
 
-# (TODO: Commande pour avoir un histoirque des tutorats demandés par une personne (+ le nombre))
-# (TODO: La même chose pour les tuteurs pour voir quels tutorats ils ont fait / le temps)
+# Choix role par année / PO / spécialité => Register role for each in db
 
-# DONE: limit all actions to only tutorinsa discord => Already done for commands
-# DONE: check config
+# Demande de tutorat (button + view)
+# Quand un tutorat est demandé, message aux tuteurs (avec possibilité de l'accepter (bouton))
 
-# DONE: documentation pour passassion (p-e une commande pour la récupérer dispo aux respos + version pour les tuteurs)
-# DONE: /manual
+# Documentation => /manual
 
-# DONE: perms + brief
+# ===== RELEASE CHECKS ===== #
+
+# Limit all actions to only tutorinsa discord => Already done for commands
+# Check configs
+# Check commands permissions
+# Check commands permissions
