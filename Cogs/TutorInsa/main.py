@@ -391,7 +391,7 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
 # Moyen pour les tuteurs de marquer un tutorat qui leur a été assigné comme fait + donner le temps consacré + commentaires + autre séance?)
 # Demande d'avis anonyme automatisée après les tutorat (view))
 
-# Commande pour avoir un histoirque des tutorats demandés par une personne (+ le nombre))
+# Commande pour avoir un historique des tutorats demandés par une personne (+ le nombre))
 # La même chose pour les tuteurs pour voir quels tutorats ils ont fait / le temps)
 
 # ===== FUNCTIONALITIES DONE ===== #
