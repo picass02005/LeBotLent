@@ -218,6 +218,8 @@ class SelectorCallbacks:
                 description=f"Vous donne le role associé à cette classe / Gives yourself the role linked to this class"
             ))
 
+        options.sort(key=lambda x: x.label)
+
         if options:
             select = discord.ui.Select(placeholder="Sélectionnez votre classe / Select your class", options=options)
             select.callback = self.selector_class_callback
