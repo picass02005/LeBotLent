@@ -230,6 +230,9 @@ class AutoThread(commands.GroupCog):
             ):
                 await self.thread_react(message)
 
+            else:
+                await message.reply("Merci de parler dans un fil pour réagir", delete_after=10)
+
 
 
 # === DO NOT REMOVE THE FOLLOWING OR CHANGE PARAMETERS === #
