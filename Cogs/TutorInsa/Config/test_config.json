@@ -1,5 +1,7 @@
 {
     "guilds": [
         1358448481756381439
-    ]
+    ],
+    "acceptRandomTimeMin": 5,
+    "acceptRandomTimeMax": 10
 }
