@@ -1,12 +1,14 @@
 # SPDX-License-Identifier: MIT
 # Copyright (C) 2025 picasso2005 <clementduran0@gmail.com> - All Rights Reserved
-
+import asyncio
 import json
+import random
 import sqlite3
 import time
 from typing import List, Tuple
 
 import discord
+from discord import NotFound
 
 from Cogs.TutorInsa.ConfirmSelect import ConfirmSelector
 from Cogs.TutorInsa.Types.ClassEntry import ClassEntry
@@ -226,12 +228,29 @@ class RequestTutoringModal(discord.ui.Modal):
         button = discord.ui.Button(
             label="Accepter le tutorat",
             style=discord.ButtonStyle.green,
-            custom_id=f"TUTORINSA.TUTOR_REQUEST_ACCEPT.{hash(f"{author.id}.{time.time()}")}"
+            custom_id=f"TUTORINSA.TUTOR_REQUEST_ACCEPT.{hash(f"{author.id}.{time.time()}")}",
+            disabled=True
         )
+
         view = discord.ui.View()
         view.add_item(button)
 
-        await channel.send(content=f"Mentions: {mentions}", embed=e, view=view)
+        msg = await channel.send(content=f"Mentions: {mentions}", embed=e, view=view)
+
+        async def modify_after(t: int, m: discord.Message, b: discord.ui.Button):
+            await asyncio.sleep(t)
+
+            v = discord.ui.View()
+            button.disabled = False
+            v.add_item(b)
+
+            await m.edit(view=v)
+
+        asyncio.create_task(modify_after(
+            random.randint(get_config("TutorInsa.acceptRandomTimeMin"), get_config("TutorInsa.acceptRandomTimeMax")),
+            msg,
+            button
+        ))
 
     def mentions(self, class_entry: ClassEntry, guild: discord.Guild) -> str:
         args: List[str | int] = class_entry.next
@@ -295,6 +314,16 @@ class TutorAcceptCallback:
 
         e = self.original_message.embeds[0]
         e.title = "Tutorat pris en charge"
+
+        try:
+            await inte.channel.fetch_message(self.original_message.id)
+
+        except NotFound:
+            await inte.followup.send(
+                "Un tuteur à déjà pris en charge ce tutorat",
+                ephemeral=True
+            )
+            return
 
         await accept_channel.send(
             content=f"# Tutorat pris en charge par {inte.user.mention}",
