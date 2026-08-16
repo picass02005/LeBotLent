@@ -72,7 +72,7 @@ class Osm(commands.GroupCog):
 
         self.database.commit()
 
-    @app_commands.command(name="register_user")
+    @app_commands.command(name="register_user", description="Match your OSM account to your discord account")
     @has_perm()
     async def register_user(self, interaction: Interaction):
         data = self.database.execute(
@@ -130,7 +130,7 @@ class Osm(commands.GroupCog):
                     "Your linked OSM account was syccessfully added to this guild", ephemeral=True
                 )
 
-    @app_commands.command(name="unregister_user")
+    @app_commands.command(name="unregister_user", description="Unmatch your OSM account to your discord account")
     @has_perm()
     async def unregister_user(self, interaction: Interaction):
         data = self.database.execute(
@@ -177,7 +177,7 @@ class Osm(commands.GroupCog):
                 ephemeral=True
             )
 
-    @app_commands.command(name="add_leaderboard_msg")
+    @app_commands.command(name="add_leaderboard_msg", description="Add a leaderboard auto message")
     @app_commands.default_permissions(administrator=True)
     @app_commands.choices(
         duration=[
@@ -225,7 +225,7 @@ class Osm(commands.GroupCog):
             ephemeral=True
         )
 
-    @app_commands.command(name="rm_leaderboard_msg")
+    @app_commands.command(name="rm_leaderboard_msg", description="Remove a leaderboard automessage")
     @app_commands.default_permissions(administrator=True)
     @has_perm()
     async def rm_leaderboard_msg(self, interaction: Interaction):
@@ -240,7 +240,7 @@ class Osm(commands.GroupCog):
         else:
             await interaction.response.send_message("You have no leaderboard message set", ephemeral=True)
 
-    @app_commands.command(name="list_leaderboard_msg")
+    @app_commands.command(name="list_leaderboard_msg", description="List all leaderboard automessages")
     @app_commands.default_permissions(administrator=True)
     @has_perm()
     async def list_leaderboard_msg(self, interaction: Interaction):
@@ -375,5 +375,3 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
 # TODO: show map
 
 # TODO: admin manage users
-
-# TODO: add brief to every commands
