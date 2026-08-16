@@ -15,7 +15,7 @@ async def get_changes_nb(py_osm: PyOSM, uid: int, from_date: datetime | None = N
     kwargs = {
         "limit": py_osm.capabilities.changesets.maximum_query_limit,
         "user_id": uid,
-        "created_timedelta": OSMTimeDelta(before=from_date),
+        "created_timedelta": OSMTimeDelta(after=from_date),
         "status": OSMStatus.OPEN_AND_CLOSED,
         "order": OSMOrder.OLDEST
     }
@@ -32,7 +32,7 @@ async def get_changes_nb(py_osm: PyOSM, uid: int, from_date: datetime | None = N
 
         else:
             kwargs.update(
-                {"created_timedelta": OSMTimeDelta(before=changesets[-1].created_at + timedelta(seconds=1))}
+                {"created_timedelta": OSMTimeDelta(after=changesets[-1].created_at + timedelta(seconds=1))}
             )
 
     return changes_nb
