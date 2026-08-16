@@ -265,6 +265,41 @@ class Osm(commands.GroupCog):
         else:
             await interaction.response.send_message("There are no leaderboard set in this guild.", ephemeral=True)
 
+    @app_commands.command(name="show_leaderboard", description="Show current leaderboard")
+    @has_perm()
+    @app_commands.choices(
+        period=[
+            app_commands.Choice(name="Last day", value="1d"),
+            app_commands.Choice(name="Last 2 days", value="2d"),
+            app_commands.Choice(name="Last week", value="1w"),
+            app_commands.Choice(name="Last 2 weeks", value="2w"),
+            app_commands.Choice(name="Last month", value="30d"),
+            app_commands.Choice(name="All time", value="all")
+        ]
+    )
+    async def show_leaderboard(self, interaction: Interaction, period: app_commands.Choice[str]):
+        if interaction.guild is None:
+            await interaction.response.send_message("You must execute this command from a guild.")
+            return None
+
+        if period.value == "all":
+            since = 0
+
+        else:
+            since = date_to_timestamp(
+                datetime.date.today() - datetime.timedelta(**transform_str_to_datetime_args(period.value))
+            )
+
+        e = make_leaderboard_embed(
+            self.database,
+            interaction.guild,
+            since
+        )
+
+        await interaction.response.send_message(embed=e, ephemeral=True)
+
+        return None
+
     @tasks.loop(minutes=get_config("Osm.Leaderboard.UpdateTimeMin"))
     async def update_data_task(self):
         await self.update_data()
