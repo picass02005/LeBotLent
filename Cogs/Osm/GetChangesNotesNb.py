@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from Cogs.Osm.Py_OSM_API import PyOSM, OSMTimeDelta, OSMSort, OSMOrder, OSMStatus
 
 
-async def get_changes_nb(py_osm: PyOSM, uid: int, from_date: datetime = None) -> int:
+async def get_changes_nb(py_osm: PyOSM, uid: int, from_date: datetime | None = None) -> int:
     if from_date is None:
         from_date = datetime.fromtimestamp(0)
 
@@ -38,7 +38,7 @@ async def get_changes_nb(py_osm: PyOSM, uid: int, from_date: datetime = None) ->
     return changes_nb
 
 
-async def get_notes_nb(py_osm: PyOSM, uid: int, from_date: datetime = None) -> int:
+async def get_notes_nb(py_osm: PyOSM, uid: int, from_date: datetime | None = None) -> int:
     if from_date is None:
         from_date = datetime.fromtimestamp(0)
 
