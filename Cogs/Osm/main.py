@@ -72,7 +72,7 @@ class Osm(commands.GroupCog):
 
         self.database.commit()
 
-    @app_commands.command(name="register_user")
+    @app_commands.command(name="register_user", description="Match your OSM account to your discord account")
     @has_perm()
     async def register_user(self, interaction: Interaction):
         data = self.database.execute(
@@ -130,7 +130,7 @@ class Osm(commands.GroupCog):
                     "Your linked OSM account was syccessfully added to this guild", ephemeral=True
                 )
 
-    @app_commands.command(name="unregister_user")
+    @app_commands.command(name="unregister_user", description="Unmatch your OSM account to your discord account")
     @has_perm()
     async def unregister_user(self, interaction: Interaction):
         data = self.database.execute(
@@ -177,7 +177,7 @@ class Osm(commands.GroupCog):
                 ephemeral=True
             )
 
-    @app_commands.command(name="add_leaderboard_msg")
+    @app_commands.command(name="add_leaderboard_msg", description="Add a leaderboard auto message")
     @app_commands.default_permissions(administrator=True)
     @app_commands.choices(
         duration=[
@@ -225,7 +225,7 @@ class Osm(commands.GroupCog):
             ephemeral=True
         )
 
-    @app_commands.command(name="rm_leaderboard_msg")
+    @app_commands.command(name="rm_leaderboard_msg", description="Remove a leaderboard automessage")
     @app_commands.default_permissions(administrator=True)
     @has_perm()
     async def rm_leaderboard_msg(self, interaction: Interaction):
@@ -240,7 +240,7 @@ class Osm(commands.GroupCog):
         else:
             await interaction.response.send_message("You have no leaderboard message set", ephemeral=True)
 
-    @app_commands.command(name="list_leaderboard_msg")
+    @app_commands.command(name="list_leaderboard_msg", description="List all leaderboard automessages")
     @app_commands.default_permissions(administrator=True)
     @has_perm()
     async def list_leaderboard_msg(self, interaction: Interaction):
@@ -264,6 +264,41 @@ class Osm(commands.GroupCog):
 
         else:
             await interaction.response.send_message("There are no leaderboard set in this guild.", ephemeral=True)
+
+    @app_commands.command(name="show_leaderboard", description="Show current leaderboard")
+    @has_perm()
+    @app_commands.choices(
+        period=[
+            app_commands.Choice(name="Last day", value="1d"),
+            app_commands.Choice(name="Last 2 days", value="2d"),
+            app_commands.Choice(name="Last week", value="1w"),
+            app_commands.Choice(name="Last 2 weeks", value="2w"),
+            app_commands.Choice(name="Last month", value="30d"),
+            app_commands.Choice(name="All time", value="all")
+        ]
+    )
+    async def show_leaderboard(self, interaction: Interaction, period: app_commands.Choice[str]):
+        if interaction.guild is None:
+            await interaction.response.send_message("You must execute this command from a guild.")
+            return None
+
+        if period.value == "all":
+            since = 0
+
+        else:
+            since = date_to_timestamp(
+                datetime.date.today() - datetime.timedelta(**transform_str_to_datetime_args(period.value))
+            )
+
+        e = make_leaderboard_embed(
+            self.database,
+            interaction.guild,
+            since
+        )
+
+        await interaction.response.send_message(embed=e, ephemeral=True)
+
+        return None
 
     @tasks.loop(minutes=get_config("Osm.Leaderboard.UpdateTimeMin"))
     async def update_data_task(self):
@@ -375,5 +410,3 @@ async def setup(bot: commands.AutoShardedBot, database: sqlite3.Connection):
 # TODO: show map
 
 # TODO: admin manage users
-
-# TODO: add brief to every commands

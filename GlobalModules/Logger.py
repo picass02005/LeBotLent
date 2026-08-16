@@ -18,4 +18,4 @@ class Logger:
         )
         self.database.commit()
 
-        print(f"[{datetime.fromtimestamp(timestamp).strftime('%H : %M : %S')} | {category}] {log_entry}")
+        print(f"[{datetime.fromtimestamp(timestamp).strftime('%H:%M:%S')} | {category}] {log_entry}")

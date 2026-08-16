@@ -40,7 +40,7 @@ class AutoThread(commands.GroupCog):
     async def __update_config_task(self):
         self.__update_config_from_db()
 
-    @app_commands.command(name="add_channel")
+    @app_commands.command(name="add_channel", description="Add a channel where we want threads under all messages")
     @app_commands.default_permissions(administrator=True)
     @has_perm()
     async def add_channel(self, interaction: Interaction, channel: TextChannel):
@@ -70,7 +70,10 @@ class AutoThread(commands.GroupCog):
 
         await resp.send_message(f"Channel <#{channel.id}> is now auto threaded.", ephemeral=True)
 
-    @app_commands.command(name="remove_channel")
+    @app_commands.command(
+        name="remove_channel",
+        description="Remove a channel where we want threads under all messages"
+    )
     @app_commands.default_permissions(administrator=True)
     @has_perm()
     async def remove_channel(self, interaction: Interaction, channel: TextChannel):
@@ -100,7 +103,10 @@ class AutoThread(commands.GroupCog):
 
         await resp.send_message(f"Channel <#{channel.id}> removed from auto threaded channels", ephemeral=True)
 
-    @app_commands.command(name="list_channels")
+    @app_commands.command(
+        name="list_channels",
+        description="List all channels where we want threads under all messages"
+    )
     @app_commands.default_permissions(administrator=True)
     @has_perm()
     async def list_channels(self, interaction: Interaction):
@@ -127,8 +133,10 @@ class AutoThread(commands.GroupCog):
 
         await resp.send_message(embed=e, ephemeral=True)
 
-
-    @app_commands.command(name="add_whitelist_thread")
+    @app_commands.command(
+        name="add_whitelist_thread",
+        description="Add an user where reaction typing THREAD will appear under they messages not in a thread"
+    )
     @app_commands.default_permissions(administrator=True)
     @has_perm()
     async def add_whitelist_thread(self, interaction: Interaction, user: Member):
@@ -149,7 +157,10 @@ class AutoThread(commands.GroupCog):
 
         await resp.send_message(f"User <@{user.id}> is now whitelisted.", ephemeral=True)
 
-    @app_commands.command(name="remove_whitelist_thread")
+    @app_commands.command(
+        name="remove_whitelist_thread",
+        description="Remove an user where reaction typing THREAD will appear under they messages not in a thread"
+    )
     @app_commands.default_permissions(administrator=True)
     @has_perm()
     async def remove_whitelist_thread(self, interaction: Interaction, user: Member):
@@ -170,7 +181,10 @@ class AutoThread(commands.GroupCog):
 
         await resp.send_message(f"User <@{user.id}> is now removed from whitelist.", ephemeral=True)
 
-    @app_commands.command(name="list_whitelist_thread")
+    @app_commands.command(
+        name="list_whitelist_thread",
+        description="List all users where reaction typing THREAD will appear under they messages not in a thread"
+    )
     @app_commands.default_permissions(administrator=True)
     @has_perm()
     async def list_whitelist_thread(self, interaction: Interaction):

@@ -53,5 +53,12 @@
         "group": [
             "bots_admin"
         ]
+    },
+    "show_leaderboard": {
+        "roles": [],
+        "users": [],
+        "permission_code": [],
+        "guilds": [],
+        "group": []
     }
 }
