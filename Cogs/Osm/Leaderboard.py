@@ -46,12 +46,14 @@ def make_leaderboard(db: sqlite3.Connection, guild_id: int, since: int) -> List[
         if len(values) == 0:
             continue
 
-        if len(values) == 1:
+        if len(values) == 1 or since == 0:
             first = (0, 0, 0, 0, 0)
             last = values[0]
 
         else:  # len(values) == 2
             first, last = values
+
+        print(first, last)
 
         changes_nb = last[0] - first[0]
         notes_nb = last[1] - first[1]
@@ -73,9 +75,15 @@ def make_leaderboard(db: sqlite3.Connection, guild_id: int, since: int) -> List[
 def make_leaderboard_embed(db: sqlite3.Connection, guild: discord.Guild, since: int) -> discord.Embed:
     leaderboard = make_leaderboard(db, guild.id, since)
 
+    if since == 0:
+        desc = f"This is the leaderboard for `{guild.name}` for all time"
+
+    else:
+        desc = f"This is the leaderboard for `{guild.name}` which takes data since <t:{since}:F>"
+
     embed = discord.Embed(
         title=f"Open street map leaderboard",
-        description=f"This is the leaderboard for `{guild.name}` which takes data since <t:{since}:F>",
+        description=desc,
         color=get_config("core.base_embed_color")
     )
 

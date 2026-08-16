@@ -269,15 +269,21 @@ class Osm(commands.GroupCog):
     @has_perm()
     @app_commands.choices(
         period=[
+            app_commands.Choice(name="All time", value="all"),
             app_commands.Choice(name="Last day", value="1d"),
             app_commands.Choice(name="Last 2 days", value="2d"),
             app_commands.Choice(name="Last week", value="1w"),
             app_commands.Choice(name="Last 2 weeks", value="2w"),
-            app_commands.Choice(name="Last month", value="30d"),
-            app_commands.Choice(name="All time", value="all")
+            app_commands.Choice(name="Last month", value="30d")
         ]
     )
-    async def show_leaderboard(self, interaction: Interaction, period: app_commands.Choice[str]):
+    async def show_leaderboard(
+            self,
+            interaction: Interaction,
+            period: app_commands.Choice[str],
+            hide_message: bool = True
+    ):
+
         if interaction.guild is None:
             await interaction.response.send_message("You must execute this command from a guild.")
             return None
@@ -296,7 +302,7 @@ class Osm(commands.GroupCog):
             since
         )
 
-        await interaction.response.send_message(embed=e, ephemeral=True)
+        await interaction.response.send_message(embed=e, ephemeral=hide_message)
 
         return None
 
