@@ -90,7 +90,7 @@ class Osm(commands.GroupCog):
             e.add_field(
                 name="By user name",
                 value="You will have to give your Open Street Map user name\n"
-                      "__This methos is case sensitibe__\n"
+                      "__This method is case sensitive__\n"
                       "**This only works if you have made at least one changeset since your account creation**",
                 inline=True
             )
